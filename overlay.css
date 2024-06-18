@@ -6,7 +6,7 @@
   position: absolute;
   display: flex;
 
-  z-index: 9999;
+  z-index: 900;
   pointer-events: none;
   background: rgba(10, 10, 10, 0.7);
   border-radius: 0px;
@@ -43,4 +43,41 @@ body {
 }
 #player-select, #simple-select, #speed-select {
   margin-right: 10px;
+}
+
+.leaderboard {
+  z-index: 1000;
+  padding: 0;
+  position: fixed;
+  top: 40px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.leaderboard.active {
+  opacity: 1;
+}
+
+.leaderboard div {
+  height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.leaderboard p {
+  display: inline-block;
+  margin: 0;
+  text-align: center;
+  font-weght: bold;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
 }

@@ -16,6 +16,21 @@ async function getTrackData(trackID) {
   return trackData;
 }
 
+async function getTrackInfo(trackID) {
+  let data = await fetch("https://api.dashcraft.io/trackv2/" + trackID + "?supportsLaps1=true", {
+    headers: {
+      'Authorization': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NWM0NmMzNGExYmEyMjQyNGYyZTAwMzIiLCJpbnRlbnQiOiJvQXV0aCIsImlhdCI6MTcwNzM3MTU3Mn0.0JVw6gJhs4R7bQGjr8cKGLE7CLAGvyuMiee7yvpsrWg'
+    }});
+  data = await data.json();
+  return data;
+}
+
+async function getLeaderboard(trackID, places=10) {
+  let data = await getTrackInfo(trackID);
+  let leaderboard = data.leaderboard;
+  return leaderboard.slice(0, places);
+}
+
 function hsvToRgb(h,s,v) 
 {
   let f= (n,k=(n+h/60)%6) => v - v*s*Math.max( Math.min(k,4-k,1), 0);

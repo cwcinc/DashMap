@@ -107,7 +107,7 @@ function drawGhostPath(w=false) {
                 rgb = [V, V, V];
             }
 
-            ctx.strokeStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+            ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.75)';
             ctx.lineWidth = 9; // Set line width
             if (w) {ctx.lineWidth = 3}
             ctx.stroke(); // Draw the line
@@ -197,6 +197,8 @@ var ghostTimeouts = [];
 
 var ghostTime = 0;
 
+var currentLB = [];
+
 async function setGhostPoints(ghostCount, delayTime=0) {
     let startTime = Date.now() + delayTime;
     
@@ -204,8 +206,11 @@ async function setGhostPoints(ghostCount, delayTime=0) {
     for (i=1; i<=ghostCount; i++) {
         allGhostData.push(await getGhost(trackId, i));
     }
-    
-    await delay(startTime - Date.now());
+    let waiting = startTime - Date.now();
+
+    if (waiting > 0) {
+        await delay(waiting);
+    }
     
     let pointsList = [];
     for (let a in allGhostData) {
@@ -353,11 +358,36 @@ async function setRoadPoints() {
     return loadTime;
 }
 
-function updateLeaderboard() {
-    hsvToRgb(30*a, 1, 1);
+async function updateLeaderboard() {
+    
+    let lbDiv = document.getElementById("leaderboard");
+    lbDiv.classList.remove('active');
+
+    let ghostCount = parseInt(document.getElementById("ghost-count").value);
+    let topLB = await getLeaderboard(trackId, ghostCount);
+
+    lbDiv.innerHTML = "";
+
+    for (let i in topLB) {
+        let color = hsvToRgb(30*i, 1, 1);
+        let name = topLB[i].user.username;
+
+        
+        let newDiv = document.createElement("div");
+        newDiv.style.width = (100 / ghostCount) + "%";
+        newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
+        let nameDiv = document.createElement("p");
+        nameDiv.innerHTML = name;
+        newDiv.appendChild(nameDiv);
+        lbDiv.appendChild(newDiv);
+    }
+
+    lbDiv.classList.add('active');
 }
 
 async function createMap() {
+    updateLeaderboard();
+    
     allGhostPoints = [];
     for (let t in ghostTimeouts) {
         clearTimeout(ghostTimeouts[t]);
