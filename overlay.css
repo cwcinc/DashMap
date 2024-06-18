@@ -9,7 +9,7 @@
   z-index: 9999;
   pointer-events: none;
   background: rgba(10, 10, 10, 0.7);
-  border-radius: 30px;
+  border-radius: 0px;
 }
 
 body {
@@ -32,6 +32,12 @@ body {
   left: 0;
   width: 100%;
 }
+
+#top-bar p {
+    display: inline-block;
+    margin: 0;
+}
+
 #track-id-input {
   margin-right: 10px;
 }

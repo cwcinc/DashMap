@@ -6,16 +6,19 @@
   <script src="pieceinfo.js"></script>
   <link rel="stylesheet" href="overlay.css">
   <link rel="stylesheet" href="style.css">
-  <title>Canvas</title>
+  <title>DashMap</title>
 </head>
 <body>
   <div id="top-bar">
-    <input type="text" id="track-id-input" placeholder="Track ID" value="6643d569e52a0be7b6e44c06">
-    <select id="player-select" hidden>
-      <option value="player1">Player 1</option>
-      <option value="player2">Player 2</option>
+    <input type="text" id="track-id-input" placeholder="Track Link">
+    <select id="ghost-count">
+      <option value="1">Top 1</option>
+      <option value="3">Top 3</option>
+      <option value="5">Top 5</option>
+      <option value="10" selected>Top 10</option>
+      <option value="none">None</option>
     </select>
-    <select id="simple-select" hidden>
+    <select id="simple-select">
       <option value="simple1">Simple 1</option>
       <option value="simple2">Simple 2</option>
       <option value="simple3">Simple 3</option>
@@ -27,10 +30,15 @@
       <option value="simple9">Simple 9</option>
       <option value="simple10">Simple 10</option>
     </select>
-    <select id="speed-select" hidden>
-      <option value="speed1">Speed 1</option>
-      <option value="speed2">Speed 2</option>
+    <select id="speed-select">
+      <option value="0.5">0.5x</option>
+      <option value="1">Normal</option>
+      <option value="2">2x</option>
+      <option value="5">5x</option>
+      <option value="10" selected>10x</option>
+      <option value="100">100x</option>
     </select>
+    <p id="timer" style="color: white; font-size: 15px; font-family: 'monospace';">0.00s</p>
   </div>
   <canvas id="minimapcanvas" class="minimap"></canvas>
 </body>

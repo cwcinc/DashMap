@@ -1,8 +1,22 @@
-var zoom = 500;
+var zoom = 300;
 var minimapRotate = true;
 var minimapTranslate = true;
 
 var ghostResolution = 1;
+
+var colorRacers = true;
+var showSpeedColor = false;
+
+var followTopCar = false;
+
+const demoTracks = [
+    "663910e5e52a0be7b6a4b47e",
+    "6643d569e52a0be7b6e44c06",
+    "66401a36e52a0be7b6c8d7cc",
+    "663ac13ae52a0be7b6ad5141",
+    "665190ba59adfc382f74ee39",
+    "664d47a059adfc382f645820"
+]
 
 function drawCar(x, y) {
     let size = 5;
@@ -45,20 +59,23 @@ function clearCanvas() {
 }
 
 function drawStadium() {
-    ctx.moveTo(...gameToCanvasCoordinates(800, 800));
+    ctx.moveTo(...gameToCanvasCoordinates(900, 900));
     ctx.beginPath();
-    ctx.lineTo(...gameToCanvasCoordinates(-800, 800));
-    ctx.lineTo(...gameToCanvasCoordinates(-800, -800));
-    ctx.lineTo(...gameToCanvasCoordinates(800, -800));
-    ctx.lineTo(...gameToCanvasCoordinates(800, 800));
+    ctx.lineTo(...gameToCanvasCoordinates(-900, 900));
+    ctx.lineTo(...gameToCanvasCoordinates(-900, -900));
+    ctx.lineTo(...gameToCanvasCoordinates(900, -900));
+    ctx.lineTo(...gameToCanvasCoordinates(900, 900));
     ctx.closePath();
-    ctx.strokeStyle = 'rgb(0, 0, 0)';
+    ctx.lineWidth = zoom / 60;
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.stroke();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+    ctx.fill();
 }
 
 // Function to draw the line
 function drawGhostPath(w=false) {
-    for (let a in allGhostPoints) {
+    for (let a = allGhostPoints.length - 1; a >= 0; a--) {
         let ghostPoints = allGhostPoints[a];
 
         for (var i = 0; i < ghostPoints.length - ghostResolution; i += ghostResolution) {
@@ -75,21 +92,28 @@ function drawGhostPath(w=false) {
 
             let rgb;
 
-            if (w) {rgb = [0,0,0]} else {
+            if (w) {
+                rgb = [0,0,0];
+                if (colorRacers) {
+                    rgb = hsvToRgb(30*a, 1, 1);
+                }
+            } else {
                 let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
                 let speed = distance / (ghostPoints[i+ghostResolution].time-ghostPoints[i].time);
 
-                let v = 1-0*(Math.pow(5, -speed));
-                rgb = hsvToRgb(speed * 1.4 - 80,1,v);
+                // let v = 1-0*(Math.pow(5, -speed));
+                // rgb = hsvToRgb(speed * 1.4 - 80,1,v);
+                let V = speed * 2;
+                rgb = [V, V, V];
             }
 
             ctx.strokeStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
-            ctx.lineWidth = zoom / 50; // Set line width
-            if (w) {ctx.lineWidth = zoom / 120}
+            ctx.lineWidth = 9; // Set line width
+            if (w) {ctx.lineWidth = 3}
             ctx.stroke(); // Draw the line
         }
         //drawSquare(...point2, "red");
-        break;
+        //break;
     }
 }
 
@@ -99,7 +123,7 @@ function drawTrackPieces() {
         let x = roadPoint.x;
         let z = roadPoint.z;
         let color = roadPoint.color;
-        let size = roadPoint.size * zoom/30;
+        let size = roadPoint.size * zoom/29.9;
 
         let point = gameToCanvasCoordinates(x, z);
 
@@ -130,8 +154,13 @@ function gameToCanvasCoordinates(x, z) {
     return [newX, newZ];
 }
 
-function updateMinimap() {
-    updatePosition();
+function updateTimer() {
+    document.getElementById("timer").innerHTML =  (Math.round(ghostTime * 100) / 100) + "s";
+}
+
+function updateMinimap(dt) {
+    updatePosition(dt);
+    updateTimer();
     
     carPose = {x:posX, z:posY};
 
@@ -147,7 +176,8 @@ function updateMinimap() {
 
     drawStadium();
     drawTrackPieces();
-    drawGhostPath();
+    if (showSpeedColor) drawGhostPath();
+    
     drawGhostPath(true);
 
     if (!minimapTranslate) {
@@ -163,9 +193,20 @@ var carPose;
 var trackId;
 var allRoadPoints;
 
-async function setGhostPoints() {
-    // let allGhostData = await getAllGhosts(trackId);
-    let allGhostData = [await getGhost(trackId, 1)];
+var ghostTimeouts = [];
+
+var ghostTime = 0;
+
+async function setGhostPoints(ghostCount, delayTime=0) {
+    let startTime = Date.now() + delayTime;
+    
+    let allGhostData = [];
+    for (i=1; i<=ghostCount; i++) {
+        allGhostData.push(await getGhost(trackId, i));
+    }
+    
+    await delay(startTime - Date.now());
+    
     let pointsList = [];
     for (let a in allGhostData) {
         let ghostData = allGhostData[a];
@@ -177,9 +218,40 @@ async function setGhostPoints() {
         }
         pointsList.push(points);
     }
+
+    allGhostPoints = [];
+    for (let t in ghostTimeouts) {
+        clearTimeout(ghostTimeouts[t]);
+    }
+
+    pointsList.sort(function(a, b) {
+        return a.length - b.length;
+    });
+
+    let playSpeed = parseFloat(document.getElementById("speed-select").value);
     
-    for (let i in pointsList[0]) {
-        setTimeout(() => {allGhostPoints = [pointsList[0].slice(0, i+1)];}, i * 30);
+    let newPointsList = pointsList.map((x) => interpolateGhostData(x, (playSpeed <= 1 ? 10 : 1)));
+    
+    for (let a in newPointsList) {
+        for (let i in newPointsList[a]) {
+            ghostTimeouts.push(setTimeout(() => {
+                allGhostPoints[a] = newPointsList[a].slice(0, i);
+                
+                let cPose = newPointsList[a][i];
+                if (a == 0 && followTopCar) {
+                    posX = cPose.x;
+                    posY = cPose.z;
+                }
+                
+                if (i == newPointsList[a].length - 1) {
+                    allGhostPoints[a] = pointsList[a];
+                }
+
+                if (a == 0) {
+                    ghostTime = cPose.time;
+                }
+            }, i * 100 / ((playSpeed <= 1 ? 10: 1) * playSpeed)));
+        }
     }
 }
 
@@ -195,8 +267,6 @@ async function setRoadPoints() {
     } else if (environment == 2) {
         document.getElementById("minimapcanvas").style.background = 'rgba(10, 20, 110, 0.7)';
     }
-
-    console.log("Environment: " + environment);
 
     let roadPoints = [];
     for (let i in trackPieces) {
@@ -226,10 +296,10 @@ async function setRoadPoints() {
                 color = "rgba(200,200,200,0.5)";
                 break;
             case "Tube":
-                color = "rgba(71,221,255,0.8)";
+                color = "rgba(71,221,255,0.5)";
                 break;
             case "Nature":
-                color = "rgba(100,255,100,0.4)";
+                color = "rgba(100,255,100,0.3)";
                 break;
             case "Pipe":
                 color = "rgba(255,255,255,0.5)";
@@ -240,8 +310,11 @@ async function setRoadPoints() {
 
         roadPoints.push({x:x, y:y, z:z, size:1, color:color, type:pieceType});
     }
+
+    const sortByY = true;
+    
     roadPoints.sort(function(a, b) {
-        let specialParts = ["Road", "Finish", "Start"];
+        let specialParts = ["Finish", "Start"];
         let aSpecial = specialParts.includes(a.type);
         let bSpecial = specialParts.includes(b.type);
 
@@ -250,22 +323,61 @@ async function setRoadPoints() {
         } else if (!aSpecial && bSpecial) {
             return -1;
         } else {
-            return a.y - b.y;
+            return sortByY ? b.y - a.y : 0;
         }
     });
 
+    const loadTime = 3000;
+    let indivTime = loadTime / roadPoints.length;
+
     for (let i in roadPoints) {
-        setTimeout(() => {allRoadPoints = roadPoints.slice(0, i+1);}, i * 20);
+        setTimeout(() => {allRoadPoints = roadPoints.slice(0, i)}, i * indivTime);
     }
 
-    return roadPoints.length * 2;
+    setTimeout(() => {
+        allRoadPoints = roadPoints.toSorted(function(a, b) {
+            let specialParts = ["Finish", "Start"];
+            let aSpecial = specialParts.includes(a.type);
+            let bSpecial = specialParts.includes(b.type);
+
+            if (aSpecial && !bSpecial) {
+                return 1;
+            } else if (!aSpecial && bSpecial) {
+                return -1;
+            } else {
+                return b.y - a.y;
+            }
+        });
+    }, loadTime + 100);
+
+    return loadTime;
+}
+
+function updateLeaderboard() {
+    hsvToRgb(30*a, 1, 1);
 }
 
 async function createMap() {
     allGhostPoints = [];
+    for (let t in ghostTimeouts) {
+        clearTimeout(ghostTimeouts[t]);
+    }
+    
     allRoadPoints = [];
     let waitTime = await setRoadPoints();
-    setTimeout(setGhostPoints, Math.min(waitTime, 2000));
+    
+    let ghostCount = parseInt(document.getElementById("ghost-count").value);
+    setGhostPoints(ghostCount, waitTime);
+}
+
+var lastTime = 0;
+
+function updateLoop(time) {
+    let dt = (time - lastTime);
+    lastTime = time;
+    
+    updateMinimap(dt);
+    requestAnimationFrame(updateLoop);
 }
 
 var minimap;
@@ -274,6 +386,11 @@ var ctx;
 window.addEventListener('load', () => {
 
     document.getElementById("track-id-input").addEventListener('input', trackInput);
+
+    document.getElementById("ghost-count").addEventListener('input', () => {
+        let ghostCount = parseInt(document.getElementById("ghost-count").value);
+        setGhostPoints(ghostCount);
+    });
     
     minimap = document.getElementById('minimapcanvas');
     ctx = minimap.getContext('2d');
@@ -286,11 +403,11 @@ window.addEventListener('load', () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    trackId = "663910e5e52a0be7b6a4b47e";
+    trackId = demoTracks[Math.floor(Math.random() * demoTracks.length)];
 
     createMap();
 
-    setInterval(updateMinimap);
+    requestAnimationFrame(updateLoop);
 });
 
 window.addEventListener('wheel', function(event) {
@@ -304,7 +421,7 @@ window.addEventListener('wheel', function(event) {
     }
 
     // Clamp the zoom value to prevent it from getting too small or too large
-    zoom = Math.max(350, Math.min(zoom, 10000));
+    zoom = Math.max(300, Math.min(zoom, 50000));
 });
 
 var mapSpeed = 5;
@@ -318,13 +435,17 @@ const keys = {
     d: false
 };
 
-function updatePosition() {
-    mapSpeed = 2000 / zoom;
+function updatePosition(dt) {
+    mapSpeed = parseFloat(dt * 500 / zoom);
+    posX = parseFloat(posX);
+    posY = parseFloat(posY);
+
+    let maxMove = 1000 + (500000 / (-200 - zoom));
     
-    if (keys.w) posY = Math.max(-600, Math.min(600, posY + mapSpeed));
-    if (keys.s) posY = Math.max(-600, Math.min(600, posY - mapSpeed));
-    if (keys.a) posX = Math.max(-600, Math.min(600, posX - mapSpeed));
-    if (keys.d) posX = Math.max(-600, Math.min(600, posX + mapSpeed));
+    if (keys.w) posY = Math.max(-maxMove, Math.min(maxMove, posY + mapSpeed));
+    if (keys.s) posY = Math.max(-maxMove, Math.min(maxMove, posY - mapSpeed));
+    if (keys.a) posX = Math.max(-maxMove, Math.min(maxMove, posX - mapSpeed));
+    if (keys.d) posX = Math.max(-maxMove, Math.min(maxMove, posX + mapSpeed));
 }
 
 window.addEventListener('keydown', function(event) {
@@ -368,6 +489,7 @@ async function trackInput() {
     let resp = await fetch("https://cdn.dashcraft.io/v2/prod/track/" + tid + ".json");
     if (resp.ok) {
         trackId = tid;
+        
         createMap();
     } else {
         console.log("not ok");
