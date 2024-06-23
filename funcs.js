@@ -5,6 +5,10 @@ function degreesToRadians(degrees) {
 async function getGhost(trackID, place) {
   let track = await (await fetch("https://api.dashcraft.io/trackv2/" + trackID)).json();
 
+  if (track.leaderboard.length < place) {
+    return false;
+  }
+
   let ghostId = track.leaderboard[place - 1]._id;
   let ghost = await (await fetch("https://cdn.dashcraft.io/v2/prod/ghost/" + ghostId + ".json")).json();
   let ghostData = ghost.snapshots;

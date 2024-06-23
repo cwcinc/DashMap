@@ -204,7 +204,11 @@ async function setGhostPoints(ghostCount, delayTime=0) {
     
     let allGhostData = [];
     for (i=1; i<=ghostCount; i++) {
-        allGhostData.push(await getGhost(trackId, i));
+        let thisGhost = await getGhost(trackId, i);
+        if (thisGhost == false) {
+            break;
+        }
+        allGhostData.push(thisGhost);
     }
     let waiting = startTime - Date.now();
 
@@ -374,6 +378,7 @@ async function updateLeaderboard() {
 
         
         let newDiv = document.createElement("div");
+        newDiv.setAttribute("ghost-number", i.toString());
         newDiv.style.width = (100 / ghostCount) + "%";
         newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
         let nameDiv = document.createElement("p");
@@ -383,6 +388,20 @@ async function updateLeaderboard() {
     }
 
     lbDiv.classList.add('active');
+
+    function handleGhostClick(ghostIndex) {
+        console.log("clicked");
+        console.log(ghostIndex);
+    }
+    
+    let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
+
+    Array.from(lbDivList).forEach(child => {
+        child.addEventListener('click', (event) => {
+            const divIndex = event.target.getAttribute('ghost-number');
+            handleGhostClick(divIndex);
+        });
+    });
 }
 
 async function createMap() {
