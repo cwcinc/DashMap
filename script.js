@@ -362,13 +362,14 @@ async function setRoadPoints() {
     return loadTime;
 }
 
+var topLB;
 async function updateLeaderboard() {
     
     let lbDiv = document.getElementById("leaderboard");
     lbDiv.classList.remove('active');
 
     let ghostCount = parseInt(document.getElementById("ghost-count").value);
-    let topLB = await getLeaderboard(trackId, ghostCount);
+    topLB = await getLeaderboard(trackId, ghostCount);
 
     lbDiv.innerHTML = "";
 
@@ -381,6 +382,7 @@ async function updateLeaderboard() {
         newDiv.setAttribute("ghost-number", i.toString());
         newDiv.style.width = (100 / ghostCount) + "%";
         newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
+        newDiv.classList = "name-box";
         let nameDiv = document.createElement("p");
         nameDiv.innerHTML = name;
         newDiv.appendChild(nameDiv);
@@ -390,16 +392,24 @@ async function updateLeaderboard() {
     lbDiv.classList.add('active');
 
     function handleGhostClick(ghostIndex) {
-        console.log("clicked");
-        console.log(ghostIndex);
+        let info = topLB[ghostIndex];
+        let place = parseInt(info.place);
+        let time = parseFloat(info.time);
+        let name = info.user.username;
+        let userID = info.user._id;
+
+        
     }
     
     let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
 
     Array.from(lbDivList).forEach(child => {
         child.addEventListener('click', (event) => {
-            const divIndex = event.target.getAttribute('ghost-number');
-            handleGhostClick(divIndex);
+            const divElement = event.target.closest('.name-box');
+            if (divElement) {
+                const divIndex = divElement.getAttribute('ghost-number');
+                handleGhostClick(divIndex);
+            } else {console.log("idk")}
         });
     });
 }
