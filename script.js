@@ -9,15 +9,6 @@ var showSpeedColor = false;
 
 var followTopCar = false;
 
-const demoTracks = [
-    "663910e5e52a0be7b6a4b47e",
-    "6643d569e52a0be7b6e44c06",
-    "66401a36e52a0be7b6c8d7cc",
-    "663ac13ae52a0be7b6ad5141",
-    "665190ba59adfc382f74ee39",
-    "664d47a059adfc382f645820"
-]
-
 function drawCar(x, y) {
     let size = 5;
 
@@ -74,7 +65,7 @@ function drawStadium() {
 }
 
 // Function to draw the line
-function drawGhostPath(w=false) {
+function drawGhostPath() {
     let AGP2;
     if (selectedGhost == null) {
         AGP2 = allGhostPoints;
@@ -95,39 +86,33 @@ function drawGhostPath(w=false) {
             ctx.lineTo(...point2);
 
             let rgb;
-
-            if (w) {
-                rgb = [0,0,0];
-                if (colorRacers) {
-                    if (selectedGhost == null) {
-                        rgb = hsvToRgb(30*a, 1, 1);
-                    } else if (a == 0) {
-                        rgb = hsvToRgb(30*selectedGhost, 1, 1);
-                    } else {
-                        rgb = hsvToRgb(30*a, 0.2, 0.6);
-                    }
-                }
-            } else {
-                if (a != 0) {
-                    break;
-                }
-                
+            if (selectedGhost != null && a == 0) {
                 let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
                 let speed = distance / (ghostPoints[i+ghostResolution].time-ghostPoints[i].time);
 
-                let v = 1-0*(Math.pow(5, -speed));
-                rgb = hsvToRgb(speed * 1.4 - 80,1,v);
-                // let V = speed * 2;
-                // rgb = [V, V, V];
+                rgb = hsvToRgb(100 * Math.pow(speed, 0.4) - 80,1,0.4 + Math.pow(speed, 2) / 1000);
+
+                ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.5)';
+                ctx.lineWidth = 12;
+                ctx.stroke();
+
+                ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+                ctx.lineWidth = 6;
+                ctx.stroke();
+            }
+            
+            if (selectedGhost == null) {
+                rgb = hsvToRgb(30*a, 1, 1);
+            } else if (a == 0) {
+                rgb = hsvToRgb(30*selectedGhost, 1, 1);
+            } else {
+                rgb = hsvToRgb(30*a, 0.2, 0.6);
             }
 
             ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.75)';
-            ctx.lineWidth = 9; // Set line width
-            if (w) {ctx.lineWidth = 3}
-            ctx.stroke(); // Draw the line
+            ctx.lineWidth = 3;
+            ctx.stroke();
         }
-        //drawSquare(...point2, "red");
-        //break;
     }
 }
 
@@ -190,9 +175,8 @@ function updateMinimap(dt) {
 
     drawStadium();
     drawTrackPieces();
-    if (showSpeedColor) drawGhostPath();
     
-    drawGhostPath(true);
+    drawGhostPath();
 
     if (!minimapTranslate) {
         drawCar(...gameToCanvasCoordinates(carPose.x, carPose.z));
@@ -254,6 +238,8 @@ async function setGhostPoints(ghostCount, delayTime=0) {
     let playSpeed = parseFloat(document.getElementById("speed-select").value);
     
     let newPointsList = pointsList.map((x) => interpolateGhostData(x, (playSpeed <= 1 ? 10 : 1)));
+
+    let fastestTime = newPointsList[0][newPointsList[0].length - 1].time;
     
     for (let a in newPointsList) {
         for (let i in newPointsList[a]) {
@@ -272,6 +258,8 @@ async function setGhostPoints(ghostCount, delayTime=0) {
 
                 if (a == 0) {
                     ghostTime = cPose.time;
+                    // let t = Math.pow(1 - (ghostTime / fastestTime), 2);
+                    // ghostResolution = Math.floor(1 + 30*t);
                 }
             }, i * 100 / ((playSpeed <= 1 ? 10: 1) * playSpeed)));
         }

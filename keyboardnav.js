@@ -1,5 +1,5 @@
 window.addEventListener('keydown', function(event) {
-    console.log(event.key);
+    //console.log(event.key);
     switch (event.key.toLowerCase()) {
         case 'w':
           keys.w = true;
