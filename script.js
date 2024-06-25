@@ -108,13 +108,17 @@ function drawGhostPath(w=false) {
                     }
                 }
             } else {
+                if (a != 0) {
+                    break;
+                }
+                
                 let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
                 let speed = distance / (ghostPoints[i+ghostResolution].time-ghostPoints[i].time);
 
-                // let v = 1-0*(Math.pow(5, -speed));
-                // rgb = hsvToRgb(speed * 1.4 - 80,1,v);
-                let V = speed * 2;
-                rgb = [V, V, V];
+                let v = 1-0*(Math.pow(5, -speed));
+                rgb = hsvToRgb(speed * 1.4 - 80,1,v);
+                // let V = speed * 2;
+                // rgb = [V, V, V];
             }
 
             ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.75)';
@@ -390,15 +394,18 @@ function handleGhostClick(ghostIndex) {
     Array.from(lbDivList).forEach(child => {
         let gIndex = parseInt(child.getAttribute("ghost-number"));
         let rgb;
+        let borderColor = 'black';
 
         if (selectedGhost == null) {
             rgb = hsvToRgb(30*gIndex, 1, 1);
         } else if (gIndex == ghostIndex) {
             rgb = hsvToRgb(30*selectedGhost, 1, 1);
+            borderColor = 'white';
         } else {
             rgb = hsvToRgb(30*gIndex, 0.2, 0.6);
         }
         child.style.backgroundColor = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)";
+        child.style.outlineColor = borderColor;
     });
 }
 
@@ -426,6 +433,7 @@ async function updateLeaderboard() {
         newDiv.setAttribute("ghost-number", i.toString());
         // newDiv.style.width = (100 / ghostCount) + "%";
         newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
+        newDiv.style.outlineColor = 'black';
         newDiv.classList = "name-box";
         let nameDiv = document.createElement("p");
         nameDiv.innerHTML = name;
