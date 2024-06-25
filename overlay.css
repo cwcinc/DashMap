@@ -26,16 +26,24 @@ body {
   background-color: #090212;
   padding: 10px;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
+  height: 20px;
+  z-index: 1000;
+
+  transition: height 1s ease;
+}
+
+#top-bar.leaderboard-enabled {
+  height: 50px;
 }
 
 #top-bar p {
-    display: inline-block;
-    margin: 0;
+  display: inline-block;
+  margin: 0;
 }
 
 #track-id-input {
@@ -53,15 +61,19 @@ body {
   left: 0;
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-
   opacity: 0;
-  transition: opacity 1s;
+
+  transition: opacity 0.3s ease-in-out;
+  transition-delay: 0s;
 }
 
 .leaderboard.active {
   opacity: 1;
+  
+  transition: opacity 1s ease-in-out;
+  transition-delay: 0.75s;
 }
 
 .leaderboard div {
@@ -70,15 +82,22 @@ body {
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  outline: black solid 2px;
+
+  margin: 0 2px;
+  flex: 1;
+
+  border-radius: 3px;
+  
+  transition: background-color 0.2s ease, flex 1s, margin 1s;
 }
 
 .leaderboard p {
   display: inline-block;
   margin: 0;
-  text-align: center;
-  font-weght: bold;
   color: white;
   white-space: nowrap;
   overflow: hidden;
   text-align: center;
+  user-select: none;
 }

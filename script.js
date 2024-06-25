@@ -75,16 +75,20 @@ function drawStadium() {
 
 // Function to draw the line
 function drawGhostPath(w=false) {
-    for (let a = allGhostPoints.length - 1; a >= 0; a--) {
-        let ghostPoints = allGhostPoints[a];
+    let AGP2;
+    if (selectedGhost == null) {
+        AGP2 = allGhostPoints;
+    } else {
+        AGP2 = [allGhostPoints[selectedGhost], ...allGhostPoints.slice(0, selectedGhost), ...allGhostPoints.slice(selectedGhost + 1)];
+    }
+    
+    
+    for (let a = AGP2.length - 1; a >= 0; a--) {
+        let ghostPoints = AGP2[a];
 
         for (var i = 0; i < ghostPoints.length - ghostResolution; i += ghostResolution) {
             let point1 = gameToCanvasCoordinates(ghostPoints[i].x, ghostPoints[i].z);
             var point2 = gameToCanvasCoordinates(ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z);
-
-            if (i == 0) {
-                //drawSquare(...point1, "rgb(97,255,158)");
-            }
 
             ctx.beginPath();
             ctx.moveTo(...point1);
@@ -95,7 +99,13 @@ function drawGhostPath(w=false) {
             if (w) {
                 rgb = [0,0,0];
                 if (colorRacers) {
-                    rgb = hsvToRgb(30*a, 1, 1);
+                    if (selectedGhost == null) {
+                        rgb = hsvToRgb(30*a, 1, 1);
+                    } else if (a == 0) {
+                        rgb = hsvToRgb(30*selectedGhost, 1, 1);
+                    } else {
+                        rgb = hsvToRgb(30*a, 0.2, 0.6);
+                    }
                 }
             } else {
                 let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
@@ -362,11 +372,45 @@ async function setRoadPoints() {
     return loadTime;
 }
 
+function handleGhostClick(ghostIndex) {
+    let info = topLB[ghostIndex];
+    let place = parseInt(info.place);
+    let time = parseFloat(info.time);
+    let name = info.user.username;
+    let userID = info.user._id;
+
+    if (ghostIndex == selectedGhost) {
+        selectedGhost = null;
+    } else {
+        selectedGhost = parseInt(ghostIndex);
+    }
+
+    let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
+
+    Array.from(lbDivList).forEach(child => {
+        let gIndex = parseInt(child.getAttribute("ghost-number"));
+        let rgb;
+
+        if (selectedGhost == null) {
+            rgb = hsvToRgb(30*gIndex, 1, 1);
+        } else if (gIndex == ghostIndex) {
+            rgb = hsvToRgb(30*selectedGhost, 1, 1);
+        } else {
+            rgb = hsvToRgb(30*gIndex, 0.2, 0.6);
+        }
+        child.style.backgroundColor = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)";
+    });
+}
+
 var topLB;
+var selectedGhost = null;
 async function updateLeaderboard() {
     
     let lbDiv = document.getElementById("leaderboard");
     lbDiv.classList.remove('active');
+
+    let menuBar = document.getElementById("top-bar");
+    menuBar.classList.remove('leaderboard-enabled');
 
     let ghostCount = parseInt(document.getElementById("ghost-count").value);
     topLB = await getLeaderboard(trackId, ghostCount);
@@ -380,7 +424,7 @@ async function updateLeaderboard() {
         
         let newDiv = document.createElement("div");
         newDiv.setAttribute("ghost-number", i.toString());
-        newDiv.style.width = (100 / ghostCount) + "%";
+        // newDiv.style.width = (100 / ghostCount) + "%";
         newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
         newDiv.classList = "name-box";
         let nameDiv = document.createElement("p");
@@ -390,16 +434,7 @@ async function updateLeaderboard() {
     }
 
     lbDiv.classList.add('active');
-
-    function handleGhostClick(ghostIndex) {
-        let info = topLB[ghostIndex];
-        let place = parseInt(info.place);
-        let time = parseFloat(info.time);
-        let name = info.user.username;
-        let userID = info.user._id;
-
-        
-    }
+    menuBar.classList.add('leaderboard-enabled');
     
     let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
 
@@ -506,40 +541,6 @@ function updatePosition(dt) {
     if (keys.a) posX = Math.max(-maxMove, Math.min(maxMove, posX - mapSpeed));
     if (keys.d) posX = Math.max(-maxMove, Math.min(maxMove, posX + mapSpeed));
 }
-
-window.addEventListener('keydown', function(event) {
-    switch (event.key.toLowerCase()) {
-        case 'w':
-            keys.w = true;
-            break;
-        case 'a':
-            keys.a = true;
-            break;
-        case 's':
-            keys.s = true;
-            break;
-        case 'd':
-            keys.d = true;
-            break;
-    }
-});
-
-window.addEventListener('keyup', function(event) {
-    switch (event.key.toLowerCase()) {
-        case 'w':
-            keys.w = false;
-            break;
-        case 'a':
-            keys.a = false;
-            break;
-        case 's':
-            keys.s = false;
-            break;
-        case 'd':
-            keys.d = false;
-            break;
-    }
-});
 
 async function trackInput() {
     let tid = document.getElementById("track-id-input").value;
