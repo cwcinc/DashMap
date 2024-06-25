@@ -72,11 +72,15 @@ function drawGhostPath() {
     } else {
         AGP2 = [allGhostPoints[selectedGhost], ...allGhostPoints.slice(0, selectedGhost), ...allGhostPoints.slice(selectedGhost + 1)];
     }
-    
+    if (AGP2.length == 0) {
+        return;
+    }
+    if (AGP2[0] == undefined) {
+        return;
+    }
     
     for (let a = AGP2.length - 1; a >= 0; a--) {
         let ghostPoints = AGP2[a];
-
         for (var i = 0; i < ghostPoints.length - ghostResolution; i += ghostResolution) {
             let point1 = gameToCanvasCoordinates(ghostPoints[i].x, ghostPoints[i].z);
             var point2 = gameToCanvasCoordinates(ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z);
@@ -336,6 +340,11 @@ async function setRoadPoints() {
 }
 
 function handleGhostClick(ghostIndex) {
+    ghostIndex = parseInt(ghostIndex);
+    if (!((0 <= ghostIndex) && (ghostIndex < allGhostPoints.length))) {
+        return;
+    }
+    
     let info = topLB[ghostIndex];
     let place = parseInt(info.place);
     let time = parseFloat(info.time);
@@ -345,7 +354,7 @@ function handleGhostClick(ghostIndex) {
     if (ghostIndex == selectedGhost) {
         selectedGhost = null;
     } else {
-        selectedGhost = parseInt(ghostIndex);
+        selectedGhost = ghostIndex;
     }
 
     let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
@@ -461,10 +470,20 @@ async function loadStartTrack() {
 
         console.log("Loading demo: ", trackId);
     }
-
+    document.getElementById("share-map-link").href = "https://cwcinc.github.io/DashMap/?trackid=" + trackId;
+    // navigator.clipboard.writeText("https://cwcinc.github.io/DashMap/?trackid=" + trackId);
+    
     createMap();
 
     requestAnimationFrame(updateLoop);
+}
+
+function redrawGhost() {
+    let ghostCount = parseInt(document.getElementById("ghost-count").value);
+    if (selectedGhost >= ghostCount) {
+        selectedGhost = null;
+    }
+    setGhostPoints(ghostCount);
 }
 
 var minimap;
@@ -475,13 +494,11 @@ window.addEventListener('load', () => {
     document.getElementById("track-id-input").addEventListener('input', trackInput);
 
     document.getElementById("ghost-count").addEventListener('input', () => {
-        let ghostCount = parseInt(document.getElementById("ghost-count").value);
-        setGhostPoints(ghostCount);
+        redrawGhost();
     });
 
     document.getElementById("speed-select").addEventListener('input', () => {
-        let ghostCount = parseInt(document.getElementById("ghost-count").value);
-        setGhostPoints(ghostCount);
+        redrawGhost();
     });
     
     minimap = document.getElementById('minimapcanvas');
@@ -539,13 +556,21 @@ function updatePosition(dt) {
 async function trackInput() {
     let idInput = document.getElementById("track-id-input");
     let tid = extractTrackId(idInput.value);
-    let exists = await trackExists(tid);
-    if (exists) {
-        trackId = tid;
-        idInput.value = trackId;
-        idInput.blur();
-        createMap();
-    } else {
-        console.log("Not a valid track");
+
+    if (tid.length != 24) {
+        console.log("Track ID length invalid");
+        return;
     }
+    
+    let exists = await trackExists(tid);
+    if (!exists) {
+        console.log("Invalid track");
+        return;
+    }
+    trackId = tid;
+    document.getElementById("share-map-link").href = "https://cwcinc.github.io/DashMap/?trackid=" + trackId;
+    // navigator.clipboard.writeText("https://cwcinc.github.io/DashMap/?trackid=" + trackId);
+    idInput.value = trackId;
+    idInput.blur();
+    createMap();
 }

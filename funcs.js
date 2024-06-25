@@ -15,8 +15,9 @@ async function getGhost(trackID, place) {
   return ghostData;
 }
 
+var version = 5;
 async function getTrackData(trackID) {
-  let trackData = await (await fetch("https://cdn.dashcraft.io/v2/prod/track/" + trackID + ".json?v=500")).json();
+  let trackData = await (await fetch("https://cdn.dashcraft.io/v2/prod/track/" + trackID + ".json?v=" + version.toString())).json();
   return trackData;
 }
 

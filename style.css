@@ -16,6 +16,15 @@ body {
   z-index: 1000;
 }
 
+.share-map {
+  position: fixed;
+  bottom: 5px;
+  right: 5px;
+  width: 50px;
+  height: auto;
+  z-index: 1000;
+}
+
 input {
   background-color: black;
   color: white;

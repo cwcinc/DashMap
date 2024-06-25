@@ -10,7 +10,6 @@ const demoTracks = [
     "667606a35b98a760eb05aa68",
     "666dd6425b98a760ebe97151",
     "66635db35b98a760ebbeeb09", // morbid7
-    "66529c6c59adfc382f796113", // fizzol
     "66565cc559adfc382f8603b6", // kjroch_
     "6652449c59adfc382f778f52", // orang0474
     "6646d04ae52a0be7b6f2ceb7", // phantominfinity
