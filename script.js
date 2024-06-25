@@ -478,6 +478,11 @@ window.addEventListener('load', () => {
         let ghostCount = parseInt(document.getElementById("ghost-count").value);
         setGhostPoints(ghostCount);
     });
+
+    document.getElementById("speed-select").addEventListener('input', () => {
+        let ghostCount = parseInt(document.getElementById("ghost-count").value);
+        setGhostPoints(ghostCount);
+    });
     
     minimap = document.getElementById('minimapcanvas');
     ctx = minimap.getContext('2d');
