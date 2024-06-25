@@ -104,3 +104,36 @@ const pieceIndex = {
     48: "Arrows",
     47: "Arrows"
 }
+
+function getPieceColor(pieceType, y) {
+    let color;
+    switch (pieceType) {
+        case "Road":
+            color = "rgba(40,40,40, 0.4)";
+            break;
+        case "Start":
+            color = "rgb(0,255,0)";
+            break;
+        case "Finish":
+            color = "rgb(255,0,0)";
+            break;
+        case "Metal":
+            color = `rgba(${100 + y},${100 + y},${100 + y},0.5)`;
+            break;
+        case "Platform":
+            color = "rgba(200,200,200,0.5)";
+            break;
+        case "Tube":
+            color = "rgba(71,221,255,0.5)";
+            break;
+        case "Nature":
+            color = "rgba(100,255,100,0.3)";
+            break;
+        case "Pipe":
+            color = "rgba(255,255,255,0.5)";
+            break;
+        case "Arrows":
+            color = "rgba(200,200,100,0.5)";
+    }
+    return color;
+}

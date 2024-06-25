@@ -288,41 +288,12 @@ async function setRoadPoints() {
 
         let pieceType = pieceIndex[id];
 
-        let color;
-
-        switch (pieceType) {
-            case "Road":
-                color = "rgba(0,0,0, 0.6)";
-                break;
-            case "Start":
-                color = "rgb(0,255,0)";
-                break;
-            case "Finish":
-                color = "rgb(255,0,0)";
-                break;
-            case "Metal":
-                color = "rgba(100,100,100,0.5)";
-                break;
-            case "Platform":
-                color = "rgba(200,200,200,0.5)";
-                break;
-            case "Tube":
-                color = "rgba(71,221,255,0.5)";
-                break;
-            case "Nature":
-                color = "rgba(100,255,100,0.3)";
-                break;
-            case "Pipe":
-                color = "rgba(255,255,255,0.5)";
-                break;
-            case "Arrows":
-                color = "rgba(200,200,100,0.5)";
-        }
+        let color = getPieceColor(pieceType, y);
 
         roadPoints.push({x:x, y:y, z:z, size:1, color:color, type:pieceType});
     }
 
-    const sortByY = true;
+    const sortByY = false;
     
     roadPoints.sort(function(a, b) {
         let specialParts = ["Finish", "Start"];
@@ -334,7 +305,7 @@ async function setRoadPoints() {
         } else if (!aSpecial && bSpecial) {
             return -1;
         } else {
-            return sortByY ? b.y - a.y : 0;
+            return sortByY ? a.y - b.y : 0;
         }
     });
 
@@ -356,7 +327,7 @@ async function setRoadPoints() {
             } else if (!aSpecial && bSpecial) {
                 return -1;
             } else {
-                return b.y - a.y;
+                return a.y - b.y;
             }
         });
     }, loadTime + 100);
@@ -470,6 +441,32 @@ function updateLoop(time) {
     requestAnimationFrame(updateLoop);
 }
 
+async function loadStartTrack() {
+    let params = new URL(document.location).searchParams;
+    let trackIDParam = params.get("trackid");
+
+    if (trackIDParam != null) {
+        trackIDParam = extractTrackId(trackIDParam);
+        console.log("Loading track: ", trackIDParam);
+        
+        let exists = await trackExists(trackIDParam);
+        if (exists) {
+            trackId = trackIDParam;
+        } else {
+            console.log("Track param invalid");
+            trackId = "667a6f295b98a760eb1bd2b2";
+        }
+    } else {
+        trackId = demoTracks[Math.floor(Math.random() * demoTracks.length)];
+
+        console.log("Loading demo: ", trackId);
+    }
+
+    createMap();
+
+    requestAnimationFrame(updateLoop);
+}
+
 var minimap;
 var ctx;
 
@@ -493,11 +490,7 @@ window.addEventListener('load', () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    trackId = demoTracks[Math.floor(Math.random() * demoTracks.length)];
-
-    createMap();
-
-    requestAnimationFrame(updateLoop);
+    loadStartTrack();
 });
 
 window.addEventListener('wheel', function(event) {
@@ -539,15 +532,15 @@ function updatePosition(dt) {
 }
 
 async function trackInput() {
-    let tid = document.getElementById("track-id-input").value;
-    tid = tid.replaceAll("/", "");
-    tid = tid.slice(tid.length - 24);
-    let resp = await fetch("https://cdn.dashcraft.io/v2/prod/track/" + tid + ".json");
-    if (resp.ok) {
+    let idInput = document.getElementById("track-id-input");
+    let tid = extractTrackId(idInput.value);
+    let exists = await trackExists(tid);
+    if (exists) {
         trackId = tid;
-        
+        idInput.value = trackId;
+        idInput.blur();
         createMap();
     } else {
-        console.log("not ok");
+        console.log("Not a valid track");
     }
 }

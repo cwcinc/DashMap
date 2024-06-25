@@ -16,7 +16,7 @@ async function getGhost(trackID, place) {
 }
 
 async function getTrackData(trackID) {
-  let trackData = await (await fetch("https://cdn.dashcraft.io/v2/prod/track/" + trackID + ".json")).json();
+  let trackData = await (await fetch("https://cdn.dashcraft.io/v2/prod/track/" + trackID + ".json?v=500")).json();
   return trackData;
 }
 
@@ -73,4 +73,15 @@ function interpolateGhostData(ghostData, mult) {
 
 function delay(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function trackExists(trackID) {
+    let resp = await fetch("https://cdn.dashcraft.io/v2/prod/track/" + trackID + ".json");
+    return resp.ok
+}
+
+function extractTrackId(trackLink) {
+    let tid = trackLink.toLowerCase().replace(/[^a-f0-9]/g, '');
+    tid = tid.slice(tid.length - 24);
+    return tid;
 }

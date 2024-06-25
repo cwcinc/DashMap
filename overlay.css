@@ -50,10 +50,10 @@ body {
 
 #track-id-input {
   margin-right: 10px;
+  width: 185px;
 }
 
-#player-select,
-#simple-select,
+#ghost-count,
 #speed-select {
   margin-right: 10px;
 }
