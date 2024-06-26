@@ -62,7 +62,8 @@ function interpolateGhostData(ghostData, mult) {
             let portionI = 1 - portion;
 
             let mixedEntry = {
-                x: (portionI * thisEntry.x + portion * nextEntry.x).toString(),
+                x: (portionI * thisEntry.x + portion * nextEntry.x).toString(), 
+                y: (portionI * thisEntry.y + portion * nextEntry.y).toString(),
                 z: (portionI * thisEntry.z + portion * nextEntry.z).toString(),
                 time: portionI * thisEntry.time + portion * nextEntry.time
             }

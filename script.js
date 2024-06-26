@@ -7,7 +7,7 @@ var ghostResolution = 1;
 var colorRacers = true;
 var showSpeedColor = false;
 
-var followTopCar = false;
+var followTopCar = true;
 
 function drawCar(x, y) {
     let size = 5;
@@ -91,7 +91,10 @@ function drawGhostPath() {
 
             let rgb;
             if (selectedGhost != null && a == 0) {
-                let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
+                // let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
+
+                // 3D
+                distance = distanceBetweenPoints3d([ghostPoints[i].x, ghostPoints[i].y, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].y, ghostPoints[i+ghostResolution].z]);
                 let speed = distance / (ghostPoints[i+ghostResolution].time-ghostPoints[i].time);
 
                 rgb = hsvToRgb(100 * Math.pow(speed, 0.4) - 80,1,0.4 + Math.pow(speed, 2) / 1000);
@@ -138,6 +141,13 @@ function distanceBetweenPoints(point1, point2) {
     var dx = point2[0] - point1[0];
     var dy = point2[1] - point1[1];
     return Math.sqrt(dx * dx + dy * dy);
+}
+
+function distanceBetweenPoints3d(point1, point2) {
+    var dx = point2[0] - point1[0];
+    var dy = point2[1] - point1[1];
+    var dz = point2[1] - point1[1];
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
 function gameToCanvasCoordinates(x, z) {
@@ -225,7 +235,7 @@ async function setGhostPoints(ghostCount, delayTime=0) {
         for (let i in ghostData) {
             let p = ghostData[i].p;
             let t = ghostData[i].t;
-            points.push({x:Number(p[0]), z:Number(p[2]), time:Number(t)});
+            points.push({x:Number(p[0]), y:Number(p[1]), z:Number(p[2]), time:Number(t)});
         }
         pointsList.push(points);
     }
@@ -251,19 +261,19 @@ async function setGhostPoints(ghostCount, delayTime=0) {
                 allGhostPoints[a] = newPointsList[a].slice(0, i);
                 
                 let cPose = newPointsList[a][i];
-                if (a == 0 && followTopCar) {
-                    posX = cPose.x;
-                    posY = cPose.z;
-                }
                 
                 if (i == newPointsList[a].length - 1) {
                     allGhostPoints[a] = pointsList[a];
                 }
 
-                if (a == 0) {
+                if (a == selectedGhost) {
                     ghostTime = cPose.time;
-                    // let t = Math.pow(1 - (ghostTime / fastestTime), 2);
-                    // ghostResolution = Math.floor(1 + 30*t);
+                    if (followTopCar) {
+                        posX = clampToMap(cPose.x);
+                        posY = clampToMap(cPose.z);
+                    }
+                } else if (a == newPointsList.length - 1) {
+                    ghostTime = cPose.time;
                 }
             }, i * 100 / ((playSpeed <= 1 ? 10: 1) * playSpeed)));
         }
@@ -339,24 +349,8 @@ async function setRoadPoints() {
     return loadTime;
 }
 
-function handleGhostClick(ghostIndex) {
-    ghostIndex = parseInt(ghostIndex);
-    if (!((0 <= ghostIndex) && (ghostIndex < allGhostPoints.length))) {
-        return;
-    }
-    
-    let info = topLB[ghostIndex];
-    let place = parseInt(info.place);
-    let time = parseFloat(info.time);
-    let name = info.user.username;
-    let userID = info.user._id;
-
-    if (ghostIndex == selectedGhost) {
-        selectedGhost = null;
-    } else {
-        selectedGhost = ghostIndex;
-    }
-
+function updateLeaderboardColors() {
+    let ghostIndex = selectedGhost;
     let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
 
     Array.from(lbDivList).forEach(child => {
@@ -375,6 +369,27 @@ function handleGhostClick(ghostIndex) {
         child.style.backgroundColor = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)";
         child.style.outlineColor = borderColor;
     });
+}
+
+function handleGhostClick(ghostIndex) {
+    ghostIndex = parseInt(ghostIndex);
+    if (!((0 <= ghostIndex) && (ghostIndex < allGhostPoints.length))) {
+        return;
+    }
+    
+    let info = topLB[ghostIndex];
+    let place = parseInt(info.place);
+    let time = parseFloat(info.time);
+    let name = info.user.username;
+    let userID = info.user._id;
+
+    if (ghostIndex == selectedGhost) {
+        selectedGhost = null;
+    } else {
+        selectedGhost = ghostIndex;
+    }
+
+    updateLeaderboardColors();
 }
 
 var topLB;
@@ -423,6 +438,8 @@ async function updateLeaderboard() {
             } else {console.log("idk")}
         });
     });
+
+    updateLeaderboardColors();
 }
 
 async function createMap() {
@@ -495,6 +512,7 @@ window.addEventListener('load', () => {
 
     document.getElementById("ghost-count").addEventListener('input', () => {
         redrawGhost();
+        updateLeaderboard();
     });
 
     document.getElementById("speed-select").addEventListener('input', () => {
@@ -525,8 +543,9 @@ window.addEventListener('wheel', function(event) {
         zoom /= 1.04;
     }
 
-    // Clamp the zoom value to prevent it from getting too small or too large
     zoom = Math.max(300, Math.min(zoom, 50000));
+    posX = clampToMap(posX);
+    posY = clampToMap(posY);
 });
 
 var mapSpeed = 5;
@@ -540,17 +559,32 @@ const keys = {
     d: false
 };
 
+var easePow = 1.15;
+function easeClampToMap(val) {
+    let maxMove = Math.pow(zoom,easePow);
+    if (maxMove == 0) return 0;
+    let b = 1 + (2 / maxMove);
+    let p = val + (Math.log(1/(2*maxMove)) / Math.log(b));
+    let c = 1 / (Math.pow(b,p) + (1/(2*maxMove)));
+    return maxMove - c;
+}
+
+function clampToMap(val) {
+    val = parseFloat(val);
+    return easeClampToMap(val);
+    let maxMove = 1000 + (500000 / (-200 - zoom));
+    return Math.max(-maxMove, Math.min(maxMove, val));
+}
+
 function updatePosition(dt) {
     mapSpeed = parseFloat(dt * 500 / zoom);
     posX = parseFloat(posX);
     posY = parseFloat(posY);
-
-    let maxMove = 1000 + (500000 / (-200 - zoom));
     
-    if (keys.w) posY = Math.max(-maxMove, Math.min(maxMove, posY + mapSpeed));
-    if (keys.s) posY = Math.max(-maxMove, Math.min(maxMove, posY - mapSpeed));
-    if (keys.a) posX = Math.max(-maxMove, Math.min(maxMove, posX - mapSpeed));
-    if (keys.d) posX = Math.max(-maxMove, Math.min(maxMove, posX + mapSpeed));
+    if (keys.w) posY = clampToMap(posY + mapSpeed);
+    if (keys.s) posY = clampToMap(posY - mapSpeed);
+    if (keys.a) posX = clampToMap(posX - mapSpeed);
+    if (keys.d) posX = clampToMap(posX + mapSpeed);
 }
 
 async function trackInput() {
