@@ -1,11 +1,7 @@
 var zoom = 300;
-var minimapRotate = true;
-var minimapTranslate = true;
+var minimapRotate = false;
 
 var ghostResolution = 1;
-
-var colorRacers = true;
-var showSpeedColor = false;
 
 var followTopCar = true;
 
@@ -154,10 +150,8 @@ function gameToCanvasCoordinates(x, z) {
     let newZ = z;
     let newX = x;
 
-    if (minimapTranslate) {
-        newX -= carPose.x;
-        newZ -= carPose.z;
-    }
+    newX -= carPose.x;
+    newZ -= carPose.z;
     // let newX = (x * Math.cos(minimapAngle)) - (z * Math.sin(minimapAngle));
     // let newZ = (x * Math.sin(minimapAngle)) + (z * Math.cos(minimapAngle));
 
@@ -183,7 +177,7 @@ function updateMinimap(dt) {
     ctx.translate(minimap.width / 2, minimap.height / 2)
 
     if (minimapRotate) {
-        let minimapAngle = degreesToRadians(0);
+        let minimapAngle = degreesToRadians(mapRotation);
         ctx.rotate(-minimapAngle);
     }
 
@@ -191,10 +185,6 @@ function updateMinimap(dt) {
     drawTrackPieces();
     
     drawGhostPath();
-
-    if (!minimapTranslate) {
-        drawCar(...gameToCanvasCoordinates(carPose.x, carPose.z));
-    }
 
     ctx.restore();
 }
@@ -548,9 +538,9 @@ window.addEventListener('wheel', function(event) {
     posY = clampToMap(posY);
 });
 
-var mapSpeed = 5;
 var posX = 0;
 var posY = 0
+var mapRotation = 0;
 
 const keys = {
     w: false,
@@ -577,7 +567,7 @@ function clampToMap(val) {
 }
 
 function updatePosition(dt) {
-    mapSpeed = parseFloat(dt * 500 / zoom);
+    let mapSpeed = parseFloat(dt * 500 / zoom);
     posX = parseFloat(posX);
     posY = parseFloat(posY);
     
@@ -585,6 +575,8 @@ function updatePosition(dt) {
     if (keys.s) posY = clampToMap(posY - mapSpeed);
     if (keys.a) posX = clampToMap(posX - mapSpeed);
     if (keys.d) posX = clampToMap(posX + mapSpeed);
+    if (keys.q) mapRotation += mapSpeed / 10;
+    if (keys.e) mapRotation -= mapSpeed / 10;
 }
 
 async function trackInput() {
@@ -603,6 +595,7 @@ async function trackInput() {
     }
     trackId = tid;
     document.getElementById("share-map-link").href = "https://cwcinc.github.io/DashMap/?trackid=" + trackId;
+    selectedGhost = null;
     // navigator.clipboard.writeText("https://cwcinc.github.io/DashMap/?trackid=" + trackId);
     idInput.value = trackId;
     idInput.blur();
