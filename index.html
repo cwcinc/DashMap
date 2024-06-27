@@ -35,9 +35,13 @@
     <p id="timer">0.00s</p>
   </div>
   <div id="leaderboard" class="leaderboard"></div>
+  
   <div id="side-settings">
     <img src="images/gear.png" class="gear-image">
-    <div id=""></div>
+    <div id="side-settings-content">
+      <button onclick="createMap()" class="settings-button">Redraw Map</button>
+      <button onclick="redrawGhost()" class="settings-button">Redraw Ghost</button>
+    </div>
   </div>
   
   <a href="https://discord.com/channels/@me" target="_blank">
@@ -48,5 +52,6 @@
     <p class="copied-label">Copied!</p>
     <img src="images/share.png" class="share-image">
   </div>
+  <img src="images/loading.gif" class="loading-image">
 </body>
 </html>

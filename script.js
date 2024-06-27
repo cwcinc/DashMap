@@ -202,6 +202,13 @@ var ghostTime = 0;
 var currentLB = [];
 
 async function setGhostPoints(ghostCount, delayTime = 0) {
+    enableLoading();
+
+    allGhostPoints = [];
+    for (let t in ghostTimeouts) {
+        clearTimeout(ghostTimeouts[t]);
+    }
+    
     let startTime = Date.now() + delayTime;
 
     let allGhostData = [];
@@ -228,11 +235,6 @@ async function setGhostPoints(ghostCount, delayTime = 0) {
             points.push({ x: Number(p[0]), y: Number(p[1]), z: Number(p[2]), time: Number(t) });
         }
         pointsList.push(points);
-    }
-
-    allGhostPoints = [];
-    for (let t in ghostTimeouts) {
-        clearTimeout(ghostTimeouts[t]);
     }
 
     pointsList.sort(function(a, b) {
@@ -268,6 +270,8 @@ async function setGhostPoints(ghostCount, delayTime = 0) {
             }, i * 100 / ((playSpeed <= 1 ? 10 : 1) * playSpeed)));
         }
     }
+
+    disableLoading();
 }
 
 async function setRoadPoints() {
@@ -362,7 +366,6 @@ function updateLeaderboardColors() {
 
 function handleGhostClick(ghostIndex) {
     let ghostIndexNew = Math.max(0, Math.min(topLB.length - 1, parseInt(ghostIndex)));
-    console.log(ghostIndexNew);
     if ((selectedGhost != null) && (ghostIndex != ghostIndexNew)) {
         return;
     }
@@ -433,6 +436,7 @@ async function updateLeaderboard() {
 }
 
 async function createMap() {
+    enableLoading();
     updateLeaderboard();
 
     allGhostPoints = [];
@@ -564,6 +568,14 @@ function clampToMap(val) {
     return easeClampToMap(val);
     let maxMove = 1000 + (500000 / (-200 - zoom));
     return Math.max(-maxMove, Math.min(maxMove, val));
+}
+
+function enableLoading() {
+    document.querySelector(".loading-image").classList.add("active");
+}
+
+function disableLoading() {
+    document.querySelector(".loading-image").classList.remove("active");
 }
 
 function updatePosition(dt) {

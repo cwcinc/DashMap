@@ -28,7 +28,7 @@ body {
   width: 50px;
   height: 70px;
   z-index: 1000;
-  
+
   animation: fadeIn 1s ease-in-out 2s both;
 }
 
@@ -58,7 +58,7 @@ body {
   width: 100%;
   height: auto;
   cursor: pointer;
-  
+
   filter: brightness(0) invert(1);
   transition: filter 0.2s ease;
 }
@@ -161,7 +161,7 @@ select:hover {
   }
 
   100% {
-    left: -127px;
+    left: -145px;
     transform: rotate(40deg);
   }
 }
@@ -180,16 +180,19 @@ select:hover {
   0% {
     opacity: 0;
   }
-  20%, 80% {
+
+  20%,
+  80% {
     opacity: 1;
   }
+
   100% {
     opacity: 0;
   }
 }
 
 #side-settings {
-  width: 100px;
+  width: 120px;
   height: 200px;
   top: 100px;
   position: fixed;
@@ -198,7 +201,7 @@ select:hover {
   border-radius: 12px;
   border: 1px solid #262626;
   transform: rotate(40deg);
-  left: -127px;
+  left: -145px;
 
   animation: rotateIn 1s ease-in-out 1s backwards;
 
@@ -214,7 +217,7 @@ select:hover {
 
 #side-settings.inactive {
   transform: rotate(40deg);
-  left: -127px;
+  left: -145px;
 
   animation: borderGlow 20s linear infinite;
 }
@@ -231,4 +234,42 @@ select:hover {
 
 #side-settings.active .gear-image {
   animation: spin 10s linear infinite;
+}
+
+#side-settings-content {
+  margin: 5px;
+  margin-top: 35px;
+  display: grid;
+}
+
+.settings-button {
+  height: 25px;
+
+  background-color: rgba(130, 200, 200, 0.5);
+  border-radius: 5px;
+  border-width: 2px;
+  border-color: black;
+  border-style: solid;
+  color: white;
+  font-size: 13px;
+}
+
+.loading-image {
+  position: absolute;
+  top: 85px;
+  left: 15px;
+  width: 50px;
+  height: 50px;
+  z-index: 1000;
+  
+  transition: opacity 1s ease-in-out, left 0.5s ease;
+  opacity: 0;
+}
+
+.loading-image.active {
+  opacity: 0.4;
+}
+
+#side-settings.active ~ .loading-image {
+  left: 140px;
 }
