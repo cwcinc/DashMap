@@ -81,7 +81,7 @@ body {
   transition-delay: 0.75s;
 }
 
-.leaderboard div {
+.name-box {
   height: 20px;
   display: flex;
   justify-content: center;
@@ -94,8 +94,16 @@ body {
   flex: 1;
 
   border-radius: 3px;
+  outline-color: black;
 
-  transition: background-color 0.2s ease, flex 1s, margin 1s, outline-color 0.05s ease-out;
+  animation: none;
+
+  transition: background-color 0.2s ease, flex 1s, margin 1s, outline-color 0.05s ease-out, animation 1s ease-in-out;
+}
+
+.name-box.active {
+  outline-color: white;
+  animation: borderGlow 4s linear infinite;
 }
 
 .leaderboard p {
@@ -106,4 +114,12 @@ body {
   overflow: hidden;
   text-align: center;
   user-select: none;
+}
+
+#timer {
+  color: white;
+  font-size: 15px;
+  font-family: 'monospace';
+  width: 30px;
+  user-select: text;
 }

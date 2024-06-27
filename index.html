@@ -6,11 +6,14 @@
   <script src="funcs.js"></script>
   <script src="pieceinfo.js"></script>
   <script src="demotracks.js"></script>
+  <script src="menu.js"></script>
   <link rel="stylesheet" href="overlay.css">
   <link rel="stylesheet" href="style.css">
   <title>DashMap</title>
 </head>
 <body>
+  <canvas id="minimapcanvas" class="minimap"></canvas>
+  <img src="images/vignette.png" style="width:100%; height:100%; z-index: 999; position:absolute; opacity: 0.3;">
   <div id="top-bar">
     <input type="text" id="track-id-input" placeholder="Track Link">
     <select id="ghost-count">
@@ -19,18 +22,6 @@
       <option value="5" selected>Top 5</option>
       <option value="10">Top 10</option>
       <option value="none">None</option>
-    </select>
-    <select id="simple-select" hidden>
-      <option value="simple1">Simple 1</option>
-      <option value="simple2">Simple 2</option>
-      <option value="simple3">Simple 3</option>
-      <option value="simple4">Simple 4</option>
-      <option value="simple5">Simple 5</option>
-      <option value="simple6">Simple 6</option>
-      <option value="simple7">Simple 7</option>
-      <option value="simple8">Simple 8</option>
-      <option value="simple9">Simple 9</option>
-      <option value="simple10">Simple 10</option>
     </select>
     <select id="speed-select">
       <option value="0.5">0.5x</option>
@@ -41,17 +32,21 @@
       <option value="25">25x</option>
     </select>
     <input type="checkbox" id="follow-ghost" class="checkmark" hidden/>
-    <p id="timer" style="color: white; font-size: 15px; font-family: 'monospace'; width: 30px">0.00s</p>
+    <p id="timer">0.00s</p>
   </div>
   <div id="leaderboard" class="leaderboard"></div>
-  <canvas id="minimapcanvas" class="minimap"></canvas>
+  <div id="side-settings">
+    <img src="images/gear.png" class="gear-image">
+    <div id=""></div>
+  </div>
   
   <a href="https://discord.com/channels/@me" target="_blank">
     <img src="images/brand.png" class="brand-image">
   </a>
 
-  <a href="" target="_blank" id="share-map-link">
-    <img src="images/share.png" class="share-map">
-  </a>
+  <div class="share-box" onclick="shareMap()">
+    <p class="copied-label">Copied!</p>
+    <img src="images/share.png" class="share-image">
+  </div>
 </body>
 </html>

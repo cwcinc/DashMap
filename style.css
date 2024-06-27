@@ -5,6 +5,9 @@ html {
 
 body {
   background-color: black;
+  user-select: none;
+
+  animation: fadeIn 1s ease-in-out both;
 }
 
 .brand-image {
@@ -14,15 +17,54 @@ body {
   width: 150px;
   height: auto;
   z-index: 1000;
+
+  animation: fadeIn 1s ease-in-out 1s both;
 }
 
-.share-map {
-  position: fixed;
+.share-box {
+  position: absolute;
   bottom: 5px;
   right: 5px;
   width: 50px;
-  height: auto;
+  height: 70px;
   z-index: 1000;
+  
+  animation: fadeIn 1s ease-in-out 2s both;
+}
+
+.copied-label {
+  position: absolute;
+  top: 0;
+  margin: 0;
+  text-align: center;
+  width: 100%;
+  color: white;
+
+  opacity: 0;
+
+  transition: opacity 0.5s ease-in-out;
+}
+
+.copied-label.active {
+  opacity: 1;
+
+  transition: none;
+}
+
+.share-image {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  height: auto;
+  cursor: pointer;
+  
+  filter: brightness(0) invert(1);
+  transition: filter 0.2s ease;
+}
+
+.share-image:hover {
+  filter: none;
 }
 
 input {
@@ -57,4 +99,136 @@ select:hover {
 
 .checkmark {
   background-color: white;
+}
+
+
+@keyframes activeBorderGlow {
+  0% {
+    box-shadow: 0 0 20px rgb(55, 0, 255, 0.6), 0 0 30px rgb(55, 0, 255, 0.4), 0 0 40px rgb(55, 0, 255, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.3);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgb(55, 0, 255, 0.6), 0 0 30px rgb(55, 0, 255, 0.4), 0 0 40px rgb(55, 0, 255, 0.3);
+  }
+}
+
+@keyframes borderGlow {
+  0% {
+    box-shadow: 0 0 20px rgb(55, 0, 255, 0.6), 0 0 30px rgb(55, 0, 255, 0.4), 0 0 40px rgb(55, 0, 255, 0.3);
+  }
+
+  50% {
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4), 0 0 40px rgba(0, 255, 255, 0.3);
+  }
+
+  100% {
+    box-shadow: 0 0 20px rgb(55, 0, 255, 0.6), 0 0 30px rgb(55, 0, 255, 0.4), 0 0 40px rgb(55, 0, 255, 0.3);
+  }
+}
+
+@keyframes shadowGlow {
+  0% {
+    filter: drop-shadow(0 0 10px rgb(55, 0, 255, 1))
+  }
+
+  50% {
+    filter: drop-shadow(0 0 10px rgb(212, 8, 137, 1))
+  }
+
+  100% {
+    filter: drop-shadow(0 0 10px rgb(55, 0, 255, 1))
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes rotateIn {
+  0% {
+    left: -170px;
+    transform: rotate(90deg);
+  }
+
+  100% {
+    left: -127px;
+    transform: rotate(40deg);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  20%, 80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#side-settings {
+  width: 100px;
+  height: 200px;
+  top: 100px;
+  position: fixed;
+  z-index: 1000;
+  background-color: rgba(20, 20, 20, 0.9);
+  border-radius: 12px;
+  border: 1px solid #262626;
+  transform: rotate(40deg);
+  left: -127px;
+
+  animation: rotateIn 1s ease-in-out 1s backwards;
+
+  transition: left 0.5s ease, animation 1s ease-in-out, transform 0.5s ease;
+}
+
+
+#side-settings.active {
+  transform: rotate(0);
+  left: 0px;
+  animation: activeBorderGlow 10s linear infinite;
+}
+
+#side-settings.inactive {
+  transform: rotate(40deg);
+  left: -127px;
+
+  animation: borderGlow 20s linear infinite;
+}
+
+.gear-image {
+  position: absolute;
+  width: 20px;
+  height: auto;
+  right: 0px;
+  top: 0px;
+
+  animation: spin 5s ease 5s infinite;
+}
+
+#side-settings.active .gear-image {
+  animation: spin 10s linear infinite;
 }

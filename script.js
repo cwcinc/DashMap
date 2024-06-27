@@ -21,7 +21,7 @@ function drawCar(x, y) {
     ctx.fill();
 }
 
-function drawSquare(x, y, color, size=10, rotation=0) {
+function drawSquare(x, y, color, size = 10, rotation = 0) {
 
     if (rotation != 0) {
         ctx.save();
@@ -74,12 +74,12 @@ function drawGhostPath() {
     if (AGP2[0] == undefined) {
         return;
     }
-    
+
     for (let a = AGP2.length - 1; a >= 0; a--) {
         let ghostPoints = AGP2[a];
         for (var i = 0; i < ghostPoints.length - ghostResolution; i += ghostResolution) {
             let point1 = gameToCanvasCoordinates(ghostPoints[i].x, ghostPoints[i].z);
-            var point2 = gameToCanvasCoordinates(ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z);
+            var point2 = gameToCanvasCoordinates(ghostPoints[i + ghostResolution].x, ghostPoints[i + ghostResolution].z);
 
             ctx.beginPath();
             ctx.moveTo(...point1);
@@ -90,10 +90,10 @@ function drawGhostPath() {
                 // let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
 
                 // 3D
-                distance = distanceBetweenPoints3d([ghostPoints[i].x, ghostPoints[i].y, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].y, ghostPoints[i+ghostResolution].z]);
-                let speed = distance / (ghostPoints[i+ghostResolution].time-ghostPoints[i].time);
+                distance = distanceBetweenPoints3d([ghostPoints[i].x, ghostPoints[i].y, ghostPoints[i].z], [ghostPoints[i + ghostResolution].x, ghostPoints[i + ghostResolution].y, ghostPoints[i + ghostResolution].z]);
+                let speed = distance / (ghostPoints[i + ghostResolution].time - ghostPoints[i].time);
 
-                rgb = hsvToRgb(100 * Math.pow(speed, 0.4) - 80,1,0.4 + Math.pow(speed, 2) / 1000);
+                rgb = hsvToRgb(100 * Math.pow(speed, 0.4) - 80, 1, 0.4 + Math.pow(speed, 2) / 1000);
 
                 ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.5)';
                 ctx.lineWidth = 12;
@@ -103,13 +103,13 @@ function drawGhostPath() {
                 ctx.lineWidth = 6;
                 ctx.stroke();
             }
-            
+
             if (selectedGhost == null) {
-                rgb = hsvToRgb(30*a, 1, 1);
+                rgb = hsvToRgb(30 * a, 1, 1);
             } else if (a == 0) {
-                rgb = hsvToRgb(30*selectedGhost, 1, 1);
+                rgb = hsvToRgb(30 * selectedGhost, 1, 1);
             } else {
-                rgb = hsvToRgb(30*a, 0.2, 0.6);
+                rgb = hsvToRgb(30 * a, 0.2, 0.6);
             }
 
             ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.75)';
@@ -125,11 +125,11 @@ function drawTrackPieces() {
         let x = roadPoint.x;
         let z = roadPoint.z;
         let color = roadPoint.color;
-        let size = roadPoint.size * zoom/29.9;
+        let size = roadPoint.size * zoom / 29.9;
 
         let point = gameToCanvasCoordinates(x, z);
 
-        drawSquare(...point, color, size=size);
+        drawSquare(...point, color, size = size);
     }
 }
 
@@ -155,21 +155,21 @@ function gameToCanvasCoordinates(x, z) {
     // let newX = (x * Math.cos(minimapAngle)) - (z * Math.sin(minimapAngle));
     // let newZ = (x * Math.sin(minimapAngle)) + (z * Math.cos(minimapAngle));
 
-    newX = (zoom)*(newX / 900);
-    newZ = -(zoom)*(newZ / 900);
+    newX = (zoom) * (newX / 900);
+    newZ = -(zoom) * (newZ / 900);
 
     return [newX, newZ];
 }
 
 function updateTimer() {
-    document.getElementById("timer").innerHTML =  (Math.round(ghostTime * 100) / 100) + "s";
+    document.getElementById("timer").innerHTML = (Math.round(ghostTime * 100) / 100) + "s";
 }
 
 function updateMinimap(dt) {
     updatePosition(dt);
     updateTimer();
-    
-    carPose = {x:posX, z:posY};
+
+    carPose = { x: posX, z: posY };
 
     clearCanvas();
 
@@ -183,7 +183,7 @@ function updateMinimap(dt) {
 
     drawStadium();
     drawTrackPieces();
-    
+
     drawGhostPath();
 
     ctx.restore();
@@ -201,11 +201,11 @@ var ghostTime = 0;
 
 var currentLB = [];
 
-async function setGhostPoints(ghostCount, delayTime=0) {
+async function setGhostPoints(ghostCount, delayTime = 0) {
     let startTime = Date.now() + delayTime;
-    
+
     let allGhostData = [];
-    for (i=1; i<=ghostCount; i++) {
+    for (i = 1; i <= ghostCount; i++) {
         let thisGhost = await getGhost(trackId, i);
         if (thisGhost == false) {
             break;
@@ -217,7 +217,7 @@ async function setGhostPoints(ghostCount, delayTime=0) {
     if (waiting > 0) {
         await delay(waiting);
     }
-    
+
     let pointsList = [];
     for (let a in allGhostData) {
         let ghostData = allGhostData[a];
@@ -225,7 +225,7 @@ async function setGhostPoints(ghostCount, delayTime=0) {
         for (let i in ghostData) {
             let p = ghostData[i].p;
             let t = ghostData[i].t;
-            points.push({x:Number(p[0]), y:Number(p[1]), z:Number(p[2]), time:Number(t)});
+            points.push({ x: Number(p[0]), y: Number(p[1]), z: Number(p[2]), time: Number(t) });
         }
         pointsList.push(points);
     }
@@ -240,18 +240,18 @@ async function setGhostPoints(ghostCount, delayTime=0) {
     });
 
     let playSpeed = parseFloat(document.getElementById("speed-select").value);
-    
+
     let newPointsList = pointsList.map((x) => interpolateGhostData(x, (playSpeed <= 1 ? 10 : 1)));
 
     let fastestTime = newPointsList[0][newPointsList[0].length - 1].time;
-    
+
     for (let a in newPointsList) {
         for (let i in newPointsList[a]) {
             ghostTimeouts.push(setTimeout(() => {
                 allGhostPoints[a] = newPointsList[a].slice(0, i);
-                
+
                 let cPose = newPointsList[a][i];
-                
+
                 if (i == newPointsList[a].length - 1) {
                     allGhostPoints[a] = pointsList[a];
                 }
@@ -265,7 +265,7 @@ async function setGhostPoints(ghostCount, delayTime=0) {
                 } else if (a == newPointsList.length - 1) {
                     ghostTime = cPose.time;
                 }
-            }, i * 100 / ((playSpeed <= 1 ? 10: 1) * playSpeed)));
+            }, i * 100 / ((playSpeed <= 1 ? 10 : 1) * playSpeed)));
         }
     }
 }
@@ -294,11 +294,11 @@ async function setRoadPoints() {
 
         let color = getPieceColor(pieceType, y);
 
-        roadPoints.push({x:x, y:y, z:z, size:1, color:color, type:pieceType});
+        roadPoints.push({ x: x, y: y, z: z, size: 1, color: color, type: pieceType });
     }
 
     const sortByY = false;
-    
+
     roadPoints.sort(function(a, b) {
         let specialParts = ["Finish", "Start"];
         let aSpecial = specialParts.includes(a.type);
@@ -317,7 +317,7 @@ async function setRoadPoints() {
     let indivTime = loadTime / roadPoints.length;
 
     for (let i in roadPoints) {
-        setTimeout(() => {allRoadPoints = roadPoints.slice(0, i)}, i * indivTime);
+        setTimeout(() => { allRoadPoints = roadPoints.slice(0, i) }, i * indivTime);
     }
 
     setTimeout(() => {
@@ -346,27 +346,28 @@ function updateLeaderboardColors() {
     Array.from(lbDivList).forEach(child => {
         let gIndex = parseInt(child.getAttribute("ghost-number"));
         let rgb;
-        let borderColor = 'black';
+        child.classList.remove('active');
 
         if (selectedGhost == null) {
-            rgb = hsvToRgb(30*gIndex, 1, 1);
+            rgb = hsvToRgb(30 * gIndex, 1, 1);
         } else if (gIndex == ghostIndex) {
-            rgb = hsvToRgb(30*selectedGhost, 1, 1);
-            borderColor = 'white';
+            rgb = hsvToRgb(30 * selectedGhost, 1, 1);
+            child.classList.add('active');
         } else {
-            rgb = hsvToRgb(30*gIndex, 0.2, 0.6);
+            rgb = hsvToRgb(30 * gIndex, 0.2, 0.6);
         }
         child.style.backgroundColor = "rgba(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ",0.5)";
-        child.style.outlineColor = borderColor;
     });
 }
 
 function handleGhostClick(ghostIndex) {
-    ghostIndex = parseInt(ghostIndex);
-    if (!((0 <= ghostIndex) && (ghostIndex < allGhostPoints.length))) {
+    let ghostIndexNew = Math.max(0, Math.min(topLB.length - 1, parseInt(ghostIndex)));
+    console.log(ghostIndexNew);
+    if ((selectedGhost != null) && (ghostIndex != ghostIndexNew)) {
         return;
     }
-    
+    ghostIndex = ghostIndexNew;
+
     let info = topLB[ghostIndex];
     let place = parseInt(info.place);
     let time = parseFloat(info.time);
@@ -385,7 +386,7 @@ function handleGhostClick(ghostIndex) {
 var topLB;
 var selectedGhost = null;
 async function updateLeaderboard() {
-    
+
     let lbDiv = document.getElementById("leaderboard");
     lbDiv.classList.remove('active');
 
@@ -398,15 +399,14 @@ async function updateLeaderboard() {
     lbDiv.innerHTML = "";
 
     for (let i in topLB) {
-        let color = hsvToRgb(30*i, 1, 1);
+        let color = hsvToRgb(30 * i, 1, 1);
         let name = topLB[i].user.username;
 
-        
+
         let newDiv = document.createElement("div");
         newDiv.setAttribute("ghost-number", i.toString());
         // newDiv.style.width = (100 / ghostCount) + "%";
         newDiv.style.backgroundColor = "rgba(" + color[0] + "," + color[1] + "," + color[2] + ",0.5)";
-        newDiv.style.outlineColor = 'black';
         newDiv.classList = "name-box";
         let nameDiv = document.createElement("p");
         nameDiv.innerHTML = name;
@@ -416,7 +416,7 @@ async function updateLeaderboard() {
 
     lbDiv.classList.add('active');
     menuBar.classList.add('leaderboard-enabled');
-    
+
     let lbDivList = document.getElementById("leaderboard").getElementsByTagName("div");
 
     Array.from(lbDivList).forEach(child => {
@@ -425,7 +425,7 @@ async function updateLeaderboard() {
             if (divElement) {
                 const divIndex = divElement.getAttribute('ghost-number');
                 handleGhostClick(divIndex);
-            } else {console.log("idk")}
+            } else { console.log("idk") }
         });
     });
 
@@ -434,15 +434,15 @@ async function updateLeaderboard() {
 
 async function createMap() {
     updateLeaderboard();
-    
+
     allGhostPoints = [];
     for (let t in ghostTimeouts) {
         clearTimeout(ghostTimeouts[t]);
     }
-    
+
     allRoadPoints = [];
     let waitTime = await setRoadPoints();
-    
+
     let ghostCount = parseInt(document.getElementById("ghost-count").value);
     setGhostPoints(ghostCount, waitTime);
 }
@@ -452,7 +452,7 @@ var lastTime = 0;
 function updateLoop(time) {
     let dt = (time - lastTime);
     lastTime = time;
-    
+
     updateMinimap(dt);
     requestAnimationFrame(updateLoop);
 }
@@ -464,7 +464,7 @@ async function loadStartTrack() {
     if (trackIDParam != null) {
         trackIDParam = extractTrackId(trackIDParam);
         console.log("Loading track: ", trackIDParam);
-        
+
         let exists = await trackExists(trackIDParam);
         if (exists) {
             trackId = trackIDParam;
@@ -477,9 +477,7 @@ async function loadStartTrack() {
 
         console.log("Loading demo: ", trackId);
     }
-    document.getElementById("share-map-link").href = "https://cwcinc.github.io/DashMap/?trackid=" + trackId;
-    // navigator.clipboard.writeText("https://cwcinc.github.io/DashMap/?trackid=" + trackId);
-    
+
     createMap();
 
     requestAnimationFrame(updateLoop);
@@ -501,14 +499,16 @@ window.addEventListener('load', () => {
     document.getElementById("track-id-input").addEventListener('input', trackInput);
 
     document.getElementById("ghost-count").addEventListener('input', () => {
+        document.getElementById("ghost-count").blur();
         redrawGhost();
         updateLeaderboard();
     });
 
     document.getElementById("speed-select").addEventListener('input', () => {
+        document.getElementById("speed-select").blur();
         redrawGhost();
     });
-    
+
     minimap = document.getElementById('minimapcanvas');
     ctx = minimap.getContext('2d');
 
@@ -516,7 +516,7 @@ window.addEventListener('load', () => {
         minimap.width = window.innerWidth;
         minimap.height = window.innerHeight;
     }
-    
+
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
@@ -551,11 +551,11 @@ const keys = {
 
 var easePow = 1.15;
 function easeClampToMap(val) {
-    let maxMove = Math.pow(zoom,easePow);
+    let maxMove = Math.pow(zoom, easePow);
     if (maxMove == 0) return 0;
     let b = 1 + (2 / maxMove);
-    let p = val + (Math.log(1/(2*maxMove)) / Math.log(b));
-    let c = 1 / (Math.pow(b,p) + (1/(2*maxMove)));
+    let p = val + (Math.log(1 / (2 * maxMove)) / Math.log(b));
+    let c = 1 / (Math.pow(b, p) + (1 / (2 * maxMove)));
     return maxMove - c;
 }
 
@@ -570,7 +570,7 @@ function updatePosition(dt) {
     let mapSpeed = parseFloat(dt * 500 / zoom);
     posX = parseFloat(posX);
     posY = parseFloat(posY);
-    
+
     if (keys.w) posY = clampToMap(posY + mapSpeed);
     if (keys.s) posY = clampToMap(posY - mapSpeed);
     if (keys.a) posX = clampToMap(posX - mapSpeed);
@@ -587,16 +587,14 @@ async function trackInput() {
         console.log("Track ID length invalid");
         return;
     }
-    
+
     let exists = await trackExists(tid);
     if (!exists) {
         console.log("Invalid track");
         return;
     }
     trackId = tid;
-    document.getElementById("share-map-link").href = "https://cwcinc.github.io/DashMap/?trackid=" + trackId;
     selectedGhost = null;
-    // navigator.clipboard.writeText("https://cwcinc.github.io/DashMap/?trackid=" + trackId);
     idInput.value = trackId;
     idInput.blur();
     createMap();
