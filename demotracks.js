@@ -7,7 +7,6 @@ const demoTracks = [
     "664d47a059adfc382f645820", // f0xy_god
     "6678cd975b98a760eb1664ce",
     "6672ceb75b98a760ebf98c36",
-    "667606a35b98a760eb05aa68",
     "666dd6425b98a760ebe97151",
     "66635db35b98a760ebbeeb09", // morbid7
     "66565cc559adfc382f8603b6", // kjroch_

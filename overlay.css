@@ -102,6 +102,7 @@ body {
 }
 
 .name-box.active {
+  flex-grow: 1.1;
   outline-color: white;
   animation: borderGlow 4s linear infinite;
 }

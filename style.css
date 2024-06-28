@@ -249,31 +249,35 @@ select:hover {
   align-items: center;
 }
 
+.settings-text {
+  color: white;
+  font-size: 13px;
+  text-wrap: nowrap;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 .settings-button {
   position: relative;
   width: 90%;
   height: 25px;
 
   margin-top: 5px;
-  
+
   background-color: rgb(44, 58, 73);
   border-width: 2px;
   border-color: black;
   border-style: solid;
-  color: white;
-  font-size: 13px;
-  text-wrap: nowrap;
   cursor: pointer;
 
   transition: width 0.3s, background-color 0.3s, border-color 0.3s;
 }
 
-#side-settings-content .settings-button:first-child {
+.topMenuItem {
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }
 
-#side-settings-content .settings-button:last-child {
+.bottomMenuItem {
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
 }
@@ -292,8 +296,8 @@ select:hover {
   width: 50px;
   height: 50px;
   z-index: 1000;
-  
-  transition: opacity 1s ease-in-out, left 0.5s ease;
+
+  transition: opacity 1s ease-in-out, left 1.5s ease;
   opacity: 0;
 }
 
@@ -301,6 +305,107 @@ select:hover {
   opacity: 0.4;
 }
 
-#side-settings.active ~ .loading-image {
+#side-settings.active~.loading-image {
+  transition: opacity 1s ease-in-out, left 0.5s ease;
+  
   left: 140px;
+}
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 90%;
+  height: 25px;
+  margin-top: 5px;
+  transition: width 0.3s;
+}
+
+.switch:hover .slider {
+  background-color: rgb(70, 117, 210, 0.5);
+  border-color: #cad0fc;
+
+  animation: borderGlow 5s linear infinite;
+}
+
+.switch:hover {
+  width: 100%;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-width: 2px;
+  border-color: black;
+  border-style: solid;
+  background-color: rgb(44, 58, 73);
+  
+  transition: transform 0.3s, background-color 0.3s, border-color 0.3s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 21px;
+  width: 21px;
+  left: 0px;
+  bottom: 0px;
+
+  outline: 2px solid black;
+  
+  background-color: rgb(128, 25, 0);
+  transition: transform 0.3s ease, background-color 0.3s, border-color 0.3s, border-bottom-left-radius 0.3s, border-bottom-right-radius 0.3s;
+}
+
+.slider.bottomMenuItem:before {
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 0;
+}
+
+input:checked + .slider {
+  background-color: rgb(44, 73, 44);
+}
+
+input:checked + .slider:before {
+  transform: translateX(74px);
+  background-color: rgb(34, 128, 0);
+}
+
+input:checked + .slider.bottomMenuItem:before {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 8px;
+}
+
+.switch:hover input:checked + .slider:before {
+  transform: translateX(85px);
+}
+
+.slider-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -7.5px;
+  user-select: none;
+  cursor: pointer;
+  margin-right: 5px;
+  margin-left: 5px;
+  text-align: right;
+  opacity: 1;
+}
+
+.switch input:checked~.slider-text {
+  text-align: left;
+  animation: fadeIn 0.5s ease-in-out both;
 }

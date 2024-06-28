@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <script src="script.js"></script>
   <script src="keyboardnav.js"></script>
@@ -9,8 +10,10 @@
   <script src="menu.js"></script>
   <link rel="stylesheet" href="overlay.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/x-icon" href="/images/gear.png">
   <title>DashMap</title>
 </head>
+
 <body>
   <canvas id="minimapcanvas" class="minimap"></canvas>
   <img src="images/vignette.png" style="width:100%; height:100%; z-index: 999; position:absolute; opacity: 0.3;">
@@ -31,19 +34,29 @@
       <option value="10" selected>10x</option>
       <option value="25">25x</option>
     </select>
-    <input type="checkbox" id="follow-ghost" class="checkmark" hidden/>
+    <input type="checkbox" id="follow-ghost" class="checkmark" hidden />
     <p id="timer">0.00s</p>
   </div>
   <div id="leaderboard" class="leaderboard"></div>
-  
+
   <div id="side-settings">
     <img src="images/gear.png" class="gear-image">
     <div id="side-settings-content">
-      <button onclick="createMap()" class="settings-button">Redraw Map</button>
-      <button onclick="redrawGhost()" class="settings-button">Redraw Ghost</button>
+      <button onclick="createMap()" class="settings-button settings-text topMenuItem">Redraw Map</button>
+      <button onclick="redrawGhost()" class="settings-button settings-text">Redraw Ghost</button>
+      <label class="switch">
+        <input type="checkbox" id="ghost-track" checked>
+        <span class="slider"></span>
+        <p class="slider-text settings-text">GhosTrack</p>
+      </label>
+      <label class="switch">
+        <input type="checkbox" id="fun-load" checked>
+        <span class="slider bottomMenuItem"></span>
+        <p class="slider-text settings-text">FunLoad</p>
+      </label>
     </div>
   </div>
-  
+
   <a href="https://discord.com/channels/@me" target="_blank">
     <img src="images/brand.png" class="brand-image">
   </a>
@@ -54,4 +67,5 @@
   </div>
   <img src="images/loading.gif" class="loading-image">
 </body>
+
 </html>
