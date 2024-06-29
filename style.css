@@ -231,6 +231,7 @@ select:hover {
   height: auto;
   right: 0px;
   top: 0px;
+  cursor: pointer;
 
   animation: spin 5s ease 5s infinite;
 }

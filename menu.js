@@ -6,6 +6,9 @@ function initSideSettings() {
   });
 
   DIV.addEventListener('mouseleave', () => {
+    if (DIV.classList.contains('locked')) {
+      return;
+    }
     DIV.classList.remove('active');
     DIV.classList.add('inactive');
   });

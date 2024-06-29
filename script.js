@@ -3,8 +3,6 @@ var minimapRotate = false;
 
 var ghostResolution = 1;
 
-var followTopCar = true;
-
 function drawCar(x, y) {
     let size = 5;
 
@@ -260,7 +258,7 @@ async function setGhostPoints(ghostCount, delayTime = 0) {
 
                 if (a == selectedGhost) {
                     ghostTime = cPose.time;
-                    if (followTopCar) {
+                    if (document.getElementById("ghost-track").checked) {
                         posX = clampToMap(cPose.x);
                         posY = clampToMap(cPose.z);
                     }
@@ -316,6 +314,11 @@ async function setRoadPoints() {
             return sortByY ? a.y - b.y : 0;
         }
     });
+
+    if (document.getElementById("quick-load").checked) {
+        allRoadPoints = roadPoints;
+        return 0;
+    }
 
     const loadTime = 3000;
     let indivTime = loadTime / roadPoints.length;

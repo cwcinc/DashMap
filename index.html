@@ -40,7 +40,7 @@
   <div id="leaderboard" class="leaderboard"></div>
 
   <div id="side-settings">
-    <img src="images/gear.png" class="gear-image">
+    <img src="images/gear.png" class="gear-image" onclick="document.getElementById('side-settings').classList.toggle('locked')">
     <div id="side-settings-content">
       <button onclick="createMap()" class="settings-button settings-text topMenuItem">Redraw Map</button>
       <button onclick="redrawGhost()" class="settings-button settings-text">Redraw Ghost</button>
@@ -50,9 +50,9 @@
         <p class="slider-text settings-text">GhosTrack</p>
       </label>
       <label class="switch">
-        <input type="checkbox" id="fun-load" checked>
+        <input type="checkbox" id="quick-load">
         <span class="slider bottomMenuItem"></span>
-        <p class="slider-text settings-text">FunLoad</p>
+        <p class="slider-text settings-text">QuickLoad</p>
       </label>
     </div>
   </div>
