@@ -10,6 +10,11 @@ body {
   animation: fadeIn 1s ease-in-out both;
 }
 
+img {
+  -webkit-user-drag: none;
+  user-select: none;
+}
+
 .brand-image {
   position: fixed;
   bottom: 0;

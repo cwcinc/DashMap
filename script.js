@@ -140,7 +140,7 @@ function distanceBetweenPoints(point1, point2) {
 function distanceBetweenPoints3d(point1, point2) {
     var dx = point2[0] - point1[0];
     var dy = point2[1] - point1[1];
-    var dz = point2[1] - point1[1];
+    var dz = point2[2] - point1[2];
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
