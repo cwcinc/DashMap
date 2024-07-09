@@ -105,35 +105,74 @@ const pieceIndex = {
     47: "Arrows"
 }
 
-function getPieceColor(pieceType, y) {
-    let color;
+function getPieceColor(pieceType, y, yRange) {
+    let yMin = yRange[0];
+    let yMax = yRange[1];
+
+    let yEffect = (y - yMin) / (yMax - yMin);
+    yEffect += 0.5;
+    
+    let color = {};
     switch (pieceType) {
         case "Road":
-            color = "rgba(40,40,40, 0.4)";
+            color.r = 40;
+            color.g = 40;
+            color.b = 40;
+            color.a = 0.4;
             break;
         case "Start":
-            color = "rgb(0,255,0)";
+            color.r = 0;
+            color.g = 0;
+            color.b = 255;
+            color.a = 1;
             break;
         case "Finish":
-            color = "rgb(255,0,0)";
+            color.r = 255;
+            color.g = 0;
+            color.b = 0;
+            color.a = 1;
             break;
         case "Metal":
-            color = `rgba(${100 + y},${100 + y},${100 + y},0.5)`;
+            color.r = 100;
+            color.g = 100;
+            color.b = 100;
+            color.a = 0.5;
             break;
         case "Platform":
-            color = "rgba(200,200,200,0.5)";
+            color.r = 200;
+            color.g = 200;
+            color.b = 200;
+            color.a = 0.5;
             break;
         case "Tube":
-            color = "rgba(71,221,255,0.5)";
+            color.r = 71;
+            color.g = 221;
+            color.b = 255;
+            color.a = 0.5;
             break;
         case "Nature":
-            color = "rgba(100,255,100,0.3)";
+            color.r = 100;
+            color.g = 255;
+            color.b = 100;
+            color.a = 0.3;
             break;
         case "Pipe":
-            color = "rgba(255,255,255,0.5)";
+            color.r = 255;
+            color.g = 255;
+            color.b = 255;
+            color.a = 0.5;
             break;
         case "Arrows":
-            color = "rgba(200,200,100,0.5)";
+            color.r = 10;
+            color.g = 10;
+            color.b = 10;
+            color.a = 0.7;
     }
-    return color;
+
+    yEffect = 1;
+
+    for (let i = 0; i < 3; i++) {
+        color[Object.keys(color)[i]] = Math.min(255, color[Object.keys(color)[i]] * yEffect);
+    }
+    return `rgba(${color.r},${color.g},${color.b},${color.a})`;
 }

@@ -50,6 +50,11 @@
         <p class="slider-text settings-text">GhosTrack</p>
       </label>
       <label class="switch">
+        <input type="checkbox" id="sort-random" checked>
+        <span class="slider"></span>
+        <p class="slider-text settings-text">SortChance</p>
+      </label>
+      <label class="switch">
         <input type="checkbox" id="quick-load">
         <span class="slider bottomMenuItem"></span>
         <p class="slider-text settings-text">QuickLoad</p>
@@ -64,6 +69,13 @@
   <div class="share-box" onclick="shareMap()">
     <p class="copied-label">Copied!</p>
     <img src="images/share.png" class="share-image">
+  </div>
+  <div class="random-box" onclick="randomMap()">
+    <img src="images/dice.png" class="share-image" onclick="
+      const element = document.querySelector('.random-box');
+      element.classList.remove('animate');
+      void element.offsetWidth;
+      element.classList.add('animate');">
   </div>
   <img src="images/loading.gif" class="loading-image">
 </body>

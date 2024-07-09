@@ -272,6 +272,22 @@ async function setGhostPoints(ghostCount, delayTime = 0) {
     disableLoading();
 }
 
+function yMinMax(trackPieces) {
+    let yMin = Number.MAX_VALUE;
+    let yMax = Number.MIN_VALUE;
+    for (let a in trackPieces) {
+        let piece = trackPieces[a];
+        let pieceY = piece.p[1];
+        if (pieceY < yMin) {
+            yMin = pieceY;
+        }
+        if (pieceY > yMax) {
+            yMax = pieceY;
+        }
+    }
+    return [yMin, yMax];
+}
+
 async function setRoadPoints() {
     let trackData = await getTrackData(trackId);
     let trackPieces = trackData.trackPieces;
@@ -286,6 +302,8 @@ async function setRoadPoints() {
     }
 
     let roadPoints = [];
+    let yRange = yMinMax(trackPieces);
+    
     for (let i in trackPieces) {
         let id = trackPieces[i].id;
         let x = trackPieces[i].p[0];
@@ -294,12 +312,12 @@ async function setRoadPoints() {
 
         let pieceType = pieceIndex[id];
 
-        let color = getPieceColor(pieceType, y);
+        let color = getPieceColor(pieceType, y, yRange);
 
         roadPoints.push({ x: x, y: y, z: z, size: 1, color: color, type: pieceType });
     }
 
-    const sortByY = false;
+    const sortByY = true;
 
     roadPoints.sort(function(a, b) {
         let specialParts = ["Finish", "Start"];
@@ -612,5 +630,11 @@ async function trackInput() {
     selectedGhost = null;
     idInput.value = trackId;
     idInput.blur();
+    createMap();
+}
+
+async function randomMap() {
+    trackId = await getRandomTrackId(true);
+    selectedGhost = null;
     createMap();
 }

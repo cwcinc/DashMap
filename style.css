@@ -37,6 +37,39 @@ img {
   animation: fadeIn 1s ease-in-out 2s both;
 }
 
+.random-box {
+  position: absolute;
+  top: 80px;
+  right: 5px;
+  width: 50px;
+  height: 50px;
+  z-index: 1000;
+
+  animation: fadeIn 1s ease-in-out 2s both;
+}
+
+@keyframes diceRoll {
+  0% {
+    transform: rotate(0deg);
+  }
+  
+  20% {
+    transform: rotate(-15deg);
+  }
+  
+  50% {
+    transform: rotate(30deg);
+  }
+
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+
+.random-box.animate {
+  animation: diceRoll 1s ease-in-out both;
+}
+
 .copied-label {
   position: absolute;
   top: 0;

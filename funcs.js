@@ -87,3 +87,39 @@ function extractTrackId(trackLink) {
     tid = tid.slice(tid.length - 24);
     return tid;
 }
+
+async function getRandomTrackId(global=true) {
+    const sortByPieceCount = document.getElementById("sort-random").checked;
+    let page;
+
+    if (!global) {
+        page = Math.floor(Math.random() * 2);
+    } else {
+        page = Math.floor(Math.random() * 180);
+    }
+    console.log("page", page);
+    let result = await fetch(`https://api.dashcraft.io/trackv2/global3?sort=recommended&verifiedOnly=${JSON.stringify(!global)}&page=${page}&pageSize=50`);
+    result = await result.json();
+
+    let result2;
+    
+    if (sortByPieceCount) {
+        let promiseArr = [];
+        for (let track in result.tracks) {
+            promiseArr.push(getTrackData(result.tracks[track]._id));
+        }
+        let promiseResult = await Promise.all(promiseArr);
+
+        
+        result2 = promiseResult.sort(function(a, b) {
+            return b.trackPieces.length - a.trackPieces.length;
+        })[0];
+    } else {
+        result2 = randomElement(result.tracks);
+    }
+    return result2._id;
+}
+
+function randomElement(arr) {
+    return arr[Math.floor(Math.random()*arr.length)];
+}
