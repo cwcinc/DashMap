@@ -58,8 +58,14 @@ function drawStadium() {
     ctx.fill();
 }
 
-// Function to draw the line
-function drawGhostPath() {
+function speedToColor(speed) {
+    let h = 0.04*Math.pow(speed,1.5);
+    let s = Math.max(0.5, -Math.pow(1.05,speed-377)+1);
+    let v = 0.004*speed;
+    return hsvToRgb(h,s,v);
+}
+
+function drawGhostPath(speedColor) {
     let AGP2;
     if (selectedGhost == null) {
         AGP2 = allGhostPoints;
@@ -84,14 +90,13 @@ function drawGhostPath() {
             ctx.lineTo(...point2);
 
             let rgb;
-            if (selectedGhost != null && a == 0) {
-                // let distance = distanceBetweenPoints([ghostPoints[i].x, ghostPoints[i].z], [ghostPoints[i+ghostResolution].x, ghostPoints[i+ghostResolution].z]);
-
-                // 3D
+            if (speedColor && (selectedGhost != null) && a == 0) {
                 distance = distanceBetweenPoints3d([ghostPoints[i].x, ghostPoints[i].y, ghostPoints[i].z], [ghostPoints[i + ghostResolution].x, ghostPoints[i + ghostResolution].y, ghostPoints[i + ghostResolution].z]);
                 let speed = distance / (ghostPoints[i + ghostResolution].time - ghostPoints[i].time);
 
-                rgb = hsvToRgb(100 * Math.pow(speed, 0.4) - 80, 1, 0.4 + Math.pow(speed, 2) / 1000);
+                speed = speed*3.6;
+
+                rgb = speedToColor(speed);
 
                 ctx.strokeStyle = 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.5)';
                 ctx.lineWidth = 12;
@@ -182,7 +187,7 @@ function updateMinimap(dt) {
     drawStadium();
     drawTrackPieces();
 
-    drawGhostPath();
+    drawGhostPath(document.getElementById("path-speed").checked);
 
     ctx.restore();
 }

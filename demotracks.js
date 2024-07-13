@@ -20,5 +20,6 @@ const demoTracks = [
     "65bd295e635608c4d25bf536", // Zingman
     "662ba775e52a0be7b640f034", // Tw666lve
     "661c6d877323a7baaebacc7e", // Foxy_God
-    "6632dc6ce52a0be7b676367d", //smoothflo
+    "6632dc6ce52a0be7b676367d", // smoothflo
+    "660bf002e296d7fad6f03236", // GPS-GBU-Spark
 ]
