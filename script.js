@@ -126,13 +126,20 @@ function drawTrackPieces() {
     for (let a in allRoadPoints) {
         let roadPoint = allRoadPoints[a];
         let x = roadPoint.x;
+        let y = roadPoint.y;
         let z = roadPoint.z;
         let color = roadPoint.color;
-        let size = roadPoint.size * zoom / 29.9;
+        let size = roadPoint.size * zoom / 30;
+        let id = roadPoint.id;
 
         let point = gameToCanvasCoordinates(x, z);
 
-        drawSquare(...point, color, size = size);
+        if (document.getElementById("realistic").checked) {
+            let trans = 0.1 + y / 3000;
+            drawComplexPiece(id, ...point, roadPoint.r, size, trans);
+        } else{
+            drawSquare(...point, color, size = size)
+        };
     }
 }
 
@@ -314,12 +321,13 @@ async function setRoadPoints() {
         let x = trackPieces[i].p[0];
         let y = trackPieces[i].p[1];
         let z = trackPieces[i].p[2];
+        let r = trackPieces[i].r;
 
         let pieceType = pieceIndex[id];
 
         let color = getPieceColor(pieceType, y, yRange);
 
-        roadPoints.push({ x: x, y: y, z: z, size: 1, color: color, type: pieceType });
+        roadPoints.push({ id: id, x: x, y: y, z: z, r: r, size: 1, color: color, type: pieceType });
     }
 
     const sortByY = true;
