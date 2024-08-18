@@ -16,7 +16,7 @@ function drawComplexPiece(id, x, y, r, size, trans) {
     finish = "#ef3533" + trans;
     platformEdge = "#dbceda" + trans;
     roadPlatform = "#e2cfdd" + trans;
-    tube = "#67ffff" + (trans / 2);
+    tube = "#67ffff" + Math.round(trans / 2);
     lightgrass = "#56d463" + trans;
     darkgrass = "#53cd5f" + trans;
     tree = "#1b6e32" + trans;
