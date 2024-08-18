@@ -30,4 +30,8 @@ function shareMap() {
 
 window.addEventListener('load', () => {
   initSideSettings();
+
+  document.getElementById("track-id-input").addEventListener("click", function() {
+    this.select();
+  });
 });

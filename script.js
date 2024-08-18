@@ -649,5 +649,6 @@ async function trackInput() {
 async function randomMap() {
     trackId = await getRandomTrackId(true);
     selectedGhost = null;
+    document.getElementById("track-id-input").value = "https://dashcraft.io/?t=" + trackId;
     createMap();
 }
